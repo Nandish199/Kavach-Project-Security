@@ -1,0 +1,283 @@
+{
+  "schema_version": "1.0",
+  "corpus": {
+    "name": "kavach-paired-source-v1",
+    "pairs": 25,
+    "samples": 50,
+    "categories": [
+      "command-injection",
+      "path-traversal",
+      "prototype-pollution",
+      "sql-injection",
+      "ssrf"
+    ]
+  },
+  "configuration": {
+    "provider": null,
+    "model": null,
+    "profile": "quick",
+    "budget": null,
+    "docker_probes": false
+  },
+  "aggregate": {
+    "deterministic_baseline": {
+      "candidates": 17,
+      "precision": 0.8235294117647058,
+      "recall": 0.56,
+      "f1": 0.6666666666666666,
+      "false_positives": 3,
+      "false_negatives": 11,
+      "per_run": [
+        {
+          "available": true,
+          "candidates": 17,
+          "true_positives": 14,
+          "false_positives": 3,
+          "false_negatives": 11,
+          "true_negatives": 22,
+          "precision": 0.8235294117647058,
+          "recall": 0.56,
+          "f1": 0.6666666666666666,
+          "by_category": {
+            "command-injection": {
+              "true_positives": 3,
+              "false_positives": 0,
+              "false_negatives": 2,
+              "precision": 1,
+              "recall": 0.6,
+              "f1": 0.7499999999999999
+            },
+            "path-traversal": {
+              "true_positives": 5,
+              "false_positives": 1,
+              "false_negatives": 0,
+              "precision": 0.8333333333333334,
+              "recall": 1,
+              "f1": 0.9090909090909091
+            },
+            "prototype-pollution": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            },
+            "sql-injection": {
+              "true_positives": 4,
+              "false_positives": 2,
+              "false_negatives": 1,
+              "precision": 0.6666666666666666,
+              "recall": 0.8,
+              "f1": 0.7272727272727272
+            },
+            "ssrf": {
+              "true_positives": 2,
+              "false_positives": 0,
+              "false_negatives": 3,
+              "precision": 1,
+              "recall": 0.4,
+              "f1": 0.5714285714285715
+            }
+          }
+        }
+      ]
+    },
+    "hunt": {
+      "candidates": null,
+      "precision": null,
+      "recall": null,
+      "f1": null,
+      "false_positives": null,
+      "false_negatives": null,
+      "per_run": [
+        {
+          "available": false,
+          "candidates": null,
+          "true_positives": null,
+          "false_positives": null,
+          "false_negatives": null,
+          "true_negatives": null,
+          "precision": null,
+          "recall": null,
+          "f1": null,
+          "by_category": {}
+        }
+      ]
+    },
+    "refutation": {
+      "candidates": null,
+      "precision": null,
+      "recall": null,
+      "f1": null,
+      "false_positives": null,
+      "false_negatives": null,
+      "per_run": [
+        {
+          "available": false,
+          "candidates": null,
+          "true_positives": null,
+          "false_positives": null,
+          "false_negatives": null,
+          "true_negatives": null,
+          "precision": null,
+          "recall": null,
+          "f1": null,
+          "by_category": {}
+        }
+      ]
+    },
+    "independent_verification": {
+      "candidates": null,
+      "precision": null,
+      "recall": null,
+      "f1": null,
+      "false_positives": null,
+      "false_negatives": null,
+      "per_run": [
+        {
+          "available": false,
+          "candidates": null,
+          "true_positives": null,
+          "false_positives": null,
+          "false_negatives": null,
+          "true_negatives": null,
+          "precision": null,
+          "recall": null,
+          "f1": null,
+          "by_category": {}
+        }
+      ]
+    },
+    "hunt_to_final_false_positive_reduction": null,
+    "baseline_to_final_false_positive_reduction": null
+  },
+  "runs": [
+    {
+      "run_id": "7b0a7d23-9c7c-4736-9f15-6b290346791e",
+      "run_status": "incomplete",
+      "model_review": "incomplete",
+      "phase_statuses": [
+        {
+          "phase": "reconnaissance",
+          "status": "incomplete"
+        },
+        {
+          "phase": "coverage-led-hunting",
+          "status": "incomplete"
+        },
+        {
+          "phase": "candidate-validation",
+          "status": "incomplete"
+        },
+        {
+          "phase": "structured-output",
+          "status": "incomplete"
+        },
+        {
+          "phase": "independent-verification",
+          "status": "incomplete"
+        },
+        {
+          "phase": "target-neutral-report",
+          "status": "incomplete"
+        }
+      ],
+      "duration_ms": 0,
+      "phases": {
+        "deterministic_baseline": {
+          "available": true,
+          "candidates": 17,
+          "true_positives": 14,
+          "false_positives": 3,
+          "false_negatives": 11,
+          "true_negatives": 22,
+          "precision": 0.8235294117647058,
+          "recall": 0.56,
+          "f1": 0.6666666666666666,
+          "by_category": {
+            "command-injection": {
+              "true_positives": 3,
+              "false_positives": 0,
+              "false_negatives": 2,
+              "precision": 1,
+              "recall": 0.6,
+              "f1": 0.7499999999999999
+            },
+            "path-traversal": {
+              "true_positives": 5,
+              "false_positives": 1,
+              "false_negatives": 0,
+              "precision": 0.8333333333333334,
+              "recall": 1,
+              "f1": 0.9090909090909091
+            },
+            "prototype-pollution": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            },
+            "sql-injection": {
+              "true_positives": 4,
+              "false_positives": 2,
+              "false_negatives": 1,
+              "precision": 0.6666666666666666,
+              "recall": 0.8,
+              "f1": 0.7272727272727272
+            },
+            "ssrf": {
+              "true_positives": 2,
+              "false_positives": 0,
+              "false_negatives": 3,
+              "precision": 1,
+              "recall": 0.4,
+              "f1": 0.5714285714285715
+            }
+          }
+        },
+        "hunt": {
+          "available": false,
+          "candidates": null,
+          "true_positives": null,
+          "false_positives": null,
+          "false_negatives": null,
+          "true_negatives": null,
+          "precision": null,
+          "recall": null,
+          "f1": null,
+          "by_category": {}
+        },
+        "refutation": {
+          "available": false,
+          "candidates": null,
+          "true_positives": null,
+          "false_positives": null,
+          "false_negatives": null,
+          "true_negatives": null,
+          "precision": null,
+          "recall": null,
+          "f1": null,
+          "by_category": {}
+        },
+        "independent_verification": {
+          "available": false,
+          "candidates": null,
+          "true_positives": null,
+          "false_positives": null,
+          "false_negatives": null,
+          "true_negatives": null,
+          "precision": null,
+          "recall": null,
+          "f1": null,
+          "by_category": {}
+        }
+      },
+      "hunt_to_final_false_positive_reduction": null,
+      "baseline_to_final_false_positive_reduction": null,
+      "snapshots": []
+    }
+  ]
+}

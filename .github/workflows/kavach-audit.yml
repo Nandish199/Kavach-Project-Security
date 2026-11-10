@@ -1,0 +1,59 @@
+name: Kavach Code Scanning
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  security-events: write
+
+concurrency:
+  group: kavach-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  kavach:
+    name: Review source and dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Run Kavach
+        id: kavach
+        uses: ./
+        with:
+          path: .
+          sarif-file: .kavach/kavach.sarif.json
+          profile: quick
+          osv: "true"
+          fail-on: confirmed
+
+      - name: Keep SARIF output as a workflow artifact
+        if: always() && hashFiles('.kavach/kavach.sarif.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: kavach-sarif
+          path: .kavach/kavach.sarif.json
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload SARIF to GitHub Code Scanning
+        if: >-
+          always() &&
+          (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) &&
+          hashFiles('.kavach/kavach.sarif.json') != ''
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: .kavach/kavach.sarif.json
+          category: kavach-source-review
+
+      - name: Apply Kavach finding policy
+        if: always() && steps.kavach.outputs.exit-code != '0'
+        shell: bash
+        env:
+          KAVACH_EXIT_CODE: ${{ steps.kavach.outputs.exit-code }}
+        run: exit "$KAVACH_EXIT_CODE"

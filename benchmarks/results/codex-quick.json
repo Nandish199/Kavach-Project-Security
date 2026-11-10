@@ -1,0 +1,825 @@
+{
+  "schema_version": "1.0",
+  "corpus": {
+    "name": "kavach-paired-source-v1",
+    "pairs": 25,
+    "samples": 50,
+    "categories": [
+      "command-injection",
+      "path-traversal",
+      "prototype-pollution",
+      "sql-injection",
+      "ssrf"
+    ]
+  },
+  "configuration": {
+    "provider": "codex",
+    "model": "cli-default",
+    "profile": "quick",
+    "budget": null,
+    "docker_probes": false
+  },
+  "aggregate": {
+    "deterministic_baseline": {
+      "candidates": 17,
+      "precision": 0.8235294117647058,
+      "recall": 0.56,
+      "f1": 0.6666666666666666,
+      "false_positives": 3,
+      "false_negatives": 11,
+      "per_run": [
+        {
+          "available": true,
+          "candidates": 17,
+          "true_positives": 14,
+          "false_positives": 3,
+          "false_negatives": 11,
+          "true_negatives": 22,
+          "precision": 0.8235294117647058,
+          "recall": 0.56,
+          "f1": 0.6666666666666666,
+          "by_category": {
+            "command-injection": {
+              "true_positives": 3,
+              "false_positives": 0,
+              "false_negatives": 2,
+              "precision": 1,
+              "recall": 0.6,
+              "f1": 0.7499999999999999
+            },
+            "path-traversal": {
+              "true_positives": 5,
+              "false_positives": 1,
+              "false_negatives": 0,
+              "precision": 0.8333333333333334,
+              "recall": 1,
+              "f1": 0.9090909090909091
+            },
+            "prototype-pollution": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            },
+            "sql-injection": {
+              "true_positives": 4,
+              "false_positives": 2,
+              "false_negatives": 1,
+              "precision": 0.6666666666666666,
+              "recall": 0.8,
+              "f1": 0.7272727272727272
+            },
+            "ssrf": {
+              "true_positives": 2,
+              "false_positives": 0,
+              "false_negatives": 3,
+              "precision": 1,
+              "recall": 0.4,
+              "f1": 0.5714285714285715
+            }
+          }
+        }
+      ]
+    },
+    "hunt": {
+      "candidates": 2,
+      "precision": 1,
+      "recall": 0.04,
+      "f1": 0.07692307692307693,
+      "false_positives": 0,
+      "false_negatives": 24,
+      "per_run": [
+        {
+          "available": true,
+          "candidates": 2,
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 24,
+          "true_negatives": 25,
+          "precision": 1,
+          "recall": 0.04,
+          "f1": 0.07692307692307693,
+          "by_category": {
+            "command-injection": {
+              "true_positives": 1,
+              "false_positives": 0,
+              "false_negatives": 4,
+              "precision": 1,
+              "recall": 0.2,
+              "f1": 0.33333333333333337
+            },
+            "path-traversal": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            },
+            "prototype-pollution": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            },
+            "sql-injection": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            },
+            "ssrf": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            }
+          }
+        }
+      ]
+    },
+    "refutation": {
+      "candidates": 2,
+      "precision": 1,
+      "recall": 0.04,
+      "f1": 0.07692307692307693,
+      "false_positives": 0,
+      "false_negatives": 24,
+      "per_run": [
+        {
+          "available": true,
+          "candidates": 2,
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 24,
+          "true_negatives": 25,
+          "precision": 1,
+          "recall": 0.04,
+          "f1": 0.07692307692307693,
+          "by_category": {
+            "command-injection": {
+              "true_positives": 1,
+              "false_positives": 0,
+              "false_negatives": 4,
+              "precision": 1,
+              "recall": 0.2,
+              "f1": 0.33333333333333337
+            },
+            "path-traversal": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            },
+            "prototype-pollution": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            },
+            "sql-injection": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            },
+            "ssrf": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            }
+          }
+        }
+      ]
+    },
+    "independent_verification": {
+      "candidates": 2,
+      "precision": 1,
+      "recall": 0.04,
+      "f1": 0.07692307692307693,
+      "false_positives": 0,
+      "false_negatives": 24,
+      "per_run": [
+        {
+          "available": true,
+          "candidates": 2,
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 24,
+          "true_negatives": 25,
+          "precision": 1,
+          "recall": 0.04,
+          "f1": 0.07692307692307693,
+          "by_category": {
+            "command-injection": {
+              "true_positives": 1,
+              "false_positives": 0,
+              "false_negatives": 4,
+              "precision": 1,
+              "recall": 0.2,
+              "f1": 0.33333333333333337
+            },
+            "path-traversal": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            },
+            "prototype-pollution": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            },
+            "sql-injection": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            },
+            "ssrf": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            }
+          }
+        }
+      ]
+    },
+    "hunt_to_final_false_positive_reduction": null,
+    "baseline_to_final_false_positive_reduction": 1
+  },
+  "runs": [
+    {
+      "run_id": "0a824c38-03d8-4678-a286-02125d2f767b",
+      "run_status": "incomplete",
+      "model_review": "incomplete",
+      "phase_statuses": [
+        {
+          "status": "complete"
+        },
+        {
+          "status": "incomplete"
+        },
+        {
+          "status": "incomplete"
+        },
+        {
+          "status": "complete"
+        },
+        {
+          "status": "incomplete"
+        },
+        {
+          "status": "complete"
+        }
+      ],
+      "duration_ms": 889110,
+      "phases": {
+        "deterministic_baseline": {
+          "available": true,
+          "candidates": 17,
+          "true_positives": 14,
+          "false_positives": 3,
+          "false_negatives": 11,
+          "true_negatives": 22,
+          "precision": 0.8235294117647058,
+          "recall": 0.56,
+          "f1": 0.6666666666666666,
+          "by_category": {
+            "command-injection": {
+              "true_positives": 3,
+              "false_positives": 0,
+              "false_negatives": 2,
+              "precision": 1,
+              "recall": 0.6,
+              "f1": 0.7499999999999999
+            },
+            "path-traversal": {
+              "true_positives": 5,
+              "false_positives": 1,
+              "false_negatives": 0,
+              "precision": 0.8333333333333334,
+              "recall": 1,
+              "f1": 0.9090909090909091
+            },
+            "prototype-pollution": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            },
+            "sql-injection": {
+              "true_positives": 4,
+              "false_positives": 2,
+              "false_negatives": 1,
+              "precision": 0.6666666666666666,
+              "recall": 0.8,
+              "f1": 0.7272727272727272
+            },
+            "ssrf": {
+              "true_positives": 2,
+              "false_positives": 0,
+              "false_negatives": 3,
+              "precision": 1,
+              "recall": 0.4,
+              "f1": 0.5714285714285715
+            }
+          }
+        },
+        "hunt": {
+          "available": true,
+          "candidates": 2,
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 24,
+          "true_negatives": 25,
+          "precision": 1,
+          "recall": 0.04,
+          "f1": 0.07692307692307693,
+          "by_category": {
+            "command-injection": {
+              "true_positives": 1,
+              "false_positives": 0,
+              "false_negatives": 4,
+              "precision": 1,
+              "recall": 0.2,
+              "f1": 0.33333333333333337
+            },
+            "path-traversal": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            },
+            "prototype-pollution": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            },
+            "sql-injection": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            },
+            "ssrf": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            }
+          }
+        },
+        "refutation": {
+          "available": true,
+          "candidates": 2,
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 24,
+          "true_negatives": 25,
+          "precision": 1,
+          "recall": 0.04,
+          "f1": 0.07692307692307693,
+          "by_category": {
+            "command-injection": {
+              "true_positives": 1,
+              "false_positives": 0,
+              "false_negatives": 4,
+              "precision": 1,
+              "recall": 0.2,
+              "f1": 0.33333333333333337
+            },
+            "path-traversal": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            },
+            "prototype-pollution": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            },
+            "sql-injection": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            },
+            "ssrf": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            }
+          }
+        },
+        "independent_verification": {
+          "available": true,
+          "candidates": 2,
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 24,
+          "true_negatives": 25,
+          "precision": 1,
+          "recall": 0.04,
+          "f1": 0.07692307692307693,
+          "by_category": {
+            "command-injection": {
+              "true_positives": 1,
+              "false_positives": 0,
+              "false_negatives": 4,
+              "precision": 1,
+              "recall": 0.2,
+              "f1": 0.33333333333333337
+            },
+            "path-traversal": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            },
+            "prototype-pollution": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            },
+            "sql-injection": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            },
+            "ssrf": {
+              "true_positives": 0,
+              "false_positives": 0,
+              "false_negatives": 5,
+              "precision": 0,
+              "recall": 0,
+              "f1": 0
+            }
+          }
+        }
+      },
+      "hunt_to_final_false_positive_reduction": null,
+      "baseline_to_final_false_positive_reduction": 1,
+      "snapshots": [
+        {
+          "run_id": "8f038638-dce4-43bd-80f6-e2f8f8c08d84",
+          "phase": "hunt",
+          "records": [
+            {
+              "verdict": "needs_validation",
+              "fingerprint": "SRC-084920843b87f9827a5ae921",
+              "title": "Caller-controlled file value enters shell command text",
+              "description": "A caller supplying req.body.file to the vulnerable convert function controls part of the string passed to exec. Shell metacharacters can therefore be interpreted as command syntax under the executing process's authority. The supplied source establishes the unsafe construction; no local process-integrity effect has been observed.",
+              "trace": [
+                {
+                  "kind": "entrypoint",
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 2,
+                  "scope": "convert(req)",
+                  "description": "The exported function accepts a request whose body.file supplies the file selector."
+                },
+                {
+                  "kind": "sink",
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 3,
+                  "scope": "convert(req)",
+                  "description": "The file selector is concatenated directly into the command string passed to exec."
+                }
+              ],
+              "evidence": [
+                {
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 1,
+                  "description": "exec is imported from node:child_process."
+                },
+                {
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 3,
+                  "description": "No validation, escaping, or argument separation occurs before exec receives the concatenated string."
+                },
+                {
+                  "file": "command-injection/cmd-01/patched.js",
+                  "line": 3,
+                  "description": "The counterpart passes req.body.file as one argument to a fixed convert executable with shell:false, preventing shell interpretation at this boundary."
+                }
+              ],
+              "claimed_root_cause": "The vulnerable function concatenates a lower-trust file selector into exec command text instead of preserving it as a separate argument. The patched counterpart demonstrates the argument boundary with spawn and shell:false.",
+              "blockers": [
+                "No bounded local check has run; interpretation of a controlled metacharacter input and its minimum process-integrity effect remain unobserved.",
+                "The supplied context does not establish the required OS-enforced execution sandbox, including external-network isolation, an empty allowlisted environment, resource limits, and artifact promotion."
+              ],
+              "validation_plan": {
+                "local": "In a parent-approved sandbox satisfying all required controls, invoke the vulnerable function with a dummy file value containing a shell separator followed by a harmless command that creates one scratch-relative marker. Supply a dummy convert executable through an explicitly allowlisted PATH. Observe only marker existence, then repeat against the patched function and verify that the same value remains a single argument and creates no marker. Record the exact fixture, invocation, limits, and promoted evidence."
+              }
+            },
+            {
+              "verdict": "needs_validation",
+              "fingerprint": "SRC-dc68e3ef7bdd98a9418f28b0",
+              "title": "Caller-controlled file value enters shell command text",
+              "description": "A caller supplying req.body.file to the vulnerable convert function can place shell syntax in the string passed to exec. The source establishes an unescaped command-construction path; no execution result has been observed. The paired patched function preserves the value as a separate argument with shell execution disabled.",
+              "trace": [
+                {
+                  "kind": "entrypoint",
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 2,
+                  "scope": "convert(req)",
+                  "description": "The exported function accepts a request containing the caller-controlled body.file value."
+                },
+                {
+                  "kind": "propagation",
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 3,
+                  "scope": "convert(req)",
+                  "description": "The file value is concatenated directly after the fixed convert command prefix."
+                },
+                {
+                  "kind": "sink",
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 3,
+                  "scope": "exec",
+                  "description": "exec receives the assembled command text, allowing filename content to cross into shell syntax."
+                }
+              ],
+              "evidence": [
+                {
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 1,
+                  "description": "exec is imported from node:child_process."
+                },
+                {
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 3,
+                  "description": "exec receives \"convert \" + req.body.file with no intervening validation or escaping."
+                },
+                {
+                  "file": "command-injection/cmd-01/patched.js",
+                  "line": 3,
+                  "description": "The sibling control uses spawn(\"convert\", [req.body.file], { shell: false }), separating executable authority from the supplied value."
+                }
+              ],
+              "claimed_root_cause": "The vulnerable function treats a caller-controlled filename as part of an executable shell command by concatenating it into exec input, without a rejecting or escaping control.",
+              "blockers": [
+                "This source-only role performed no bounded local execution, so shell interpretation and the minimum process-integrity effect remain unobserved.",
+                "The supplied material does not establish an approved execution sandbox or artifact-promotion procedure."
+              ],
+              "validation_plan": {
+                "local": "In a parent-approved isolated sandbox, place a harmless dummy convert executable on an explicitly allowlisted PATH. Invoke each function with dummy req.body.file equal to \"dummy; printf cmd01_marker\". Observe whether the vulnerable invocation emits the marker through shell interpretation and whether the patched invocation passes the complete string as one literal argument. Use scratch-only output and bounded resources; stop after that minimum result."
+              }
+            }
+          ]
+        },
+        {
+          "run_id": "8f038638-dce4-43bd-80f6-e2f8f8c08d84",
+          "phase": "refutation",
+          "records": [
+            {
+              "verdict": "needs_validation",
+              "fingerprint": "SRC-084920843b87f9827a5ae921",
+              "title": "Caller-controlled file value enters shell command text",
+              "description": "The exported convert(req) function concatenates req.body.file into the string passed to exec. The supplied source shows no validation or argument separation on this path. Whether a controlled input produces the proposed additional-command effect has not been observed.",
+              "trace": [
+                {
+                  "kind": "entrypoint",
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 2,
+                  "scope": "convert(req)",
+                  "description": "The exported function accepts req and reads its body.file property on line 3; no external route or authentication context is supplied."
+                },
+                {
+                  "kind": "sink",
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 3,
+                  "scope": "convert(req)",
+                  "description": "The function concatenates req.body.file after the fixed convert prefix and passes the resulting command string to exec."
+                }
+              ],
+              "evidence": [
+                {
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 1,
+                  "description": "exec is imported from node:child_process."
+                },
+                {
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 3,
+                  "description": "The caller-supplied property enters exec command text directly, with no source-visible validation, escaping, or separate argument array."
+                }
+              ],
+              "claimed_root_cause": "The function places the caller-supplied file selector into exec command text without preserving a separate process-argument boundary. The supplied excerpt establishes this construction but does not establish external reachability, execution identity, or an observed additional-command effect. The patched counterpart cannot be independently checked because its source excerpt was not supplied.",
+              "blockers": [
+                "The candidate-specific Docker run was unavailable because the optional Docker probe runner was not enabled or available. No completed candidate-specific run, parent-written artifact path, or observed boundary result was supplied.",
+                "The supplied context does not establish the required OS-enforced execution controls or trusted parent-side artifact promotion. Execution is also prohibited for this review."
+              ],
+              "validation_plan": {
+                "local": "When the required sandbox and candidate-specific Docker runner are available, use a dummy request with body.file set to 'dummy; printf probe > marker.txt'. Run from a dedicated scratch working directory with a trusted dummy convert executable on an explicitly allowlisted PATH, no external network, an empty environment except that PATH, read-only target and tools, scratch-only writes, and explicit low process, memory, CPU, and wall-clock limits. Invoke the exported convert(req) function and wait for its returned child process to terminate. A trusted parent must inspect only the predeclared marker.txt using the supplied promotion procedure and record whether its exact contents are 'probe'. Retain only successfully promoted, bounded evidence recording the fixture, invocation, limits, and observed result. Do not infer broader execution privileges or deployment reachability from this fixture."
+              }
+            },
+            {
+              "verdict": "needs_validation",
+              "fingerprint": "SRC-dc68e3ef7bdd98a9418f28b0",
+              "title": "Caller-controlled file value enters shell command text",
+              "description": "The exported convert(req) function concatenates req.body.file directly into command text passed to exec. The supplied source shows no validation or escaping on this path. Shell interpretation and a resulting process-integrity effect have not been observed. The excerpt does not establish a deployed request route or authorization context.",
+              "trace": [
+                {
+                  "kind": "entrypoint",
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 2,
+                  "scope": "convert(req)",
+                  "description": "The exported function accepts a request-shaped argument; its body.file property supplies the lower-trust value under the candidate's caller-control assumption."
+                },
+                {
+                  "kind": "propagation",
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 3,
+                  "scope": "convert(req)",
+                  "description": "req.body.file is concatenated directly after the fixed \"convert \" prefix without a visible validation or escaping step."
+                },
+                {
+                  "kind": "sink",
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 3,
+                  "scope": "exec",
+                  "description": "The assembled string is passed to exec as command text."
+                }
+              ],
+              "evidence": [
+                {
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 1,
+                  "description": "exec is imported from node:child_process."
+                },
+                {
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 3,
+                  "description": "The function returns exec(\"convert \" + req.body.file), establishing the direct value-to-command-text path."
+                }
+              ],
+              "claimed_root_cause": "The exported function concatenates the caller-supplied req.body.file value into exec command text without a source-visible rejecting or escaping control.",
+              "blockers": [
+                "The candidate-specific Docker runner was unavailable, so no completed bounded execution establishes shell interpretation or a minimum process-integrity effect.",
+                "No parent-written artifact path containing an independently observed candidate-specific result was supplied. The promotion procedure is specified, but its execution and successful artifact promotion are not established."
+              ],
+              "validation_plan": {
+                "local": "When the approved Docker runner and trusted parent-side artifact promotion are available, use an isolated fixture with no external network, an empty allowlisted environment, read-only target and tools, scratch-only writes, and explicit low resource and wall-clock limits. Put a harmless dummy convert executable on the allowlisted PATH and invoke the exported convert function with {body:{file:\"dummy; printf cmd01_marker\"}}. Capture child stdout and completion status within explicit byte and time limits, and stop after observing whether the marker is emitted through shell interpretation. Retain evidence only through the supplied trusted parent-side promotion procedure to a predeclared artifact file."
+              }
+            }
+          ]
+        },
+        {
+          "run_id": "8f038638-dce4-43bd-80f6-e2f8f8c08d84",
+          "phase": "independent_verification",
+          "records": [
+            {
+              "verdict": "needs_validation",
+              "fingerprint": "SRC-084920843b87f9827a5ae921",
+              "title": "Caller-controlled file value enters shell command text",
+              "description": "The exported convert(req) function concatenates req.body.file into the string passed to exec. The supplied source shows no validation or argument separation on this path. Whether a controlled input produces the proposed additional-command effect has not been observed.",
+              "trace": [
+                {
+                  "kind": "entrypoint",
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 2,
+                  "scope": "convert(req)",
+                  "description": "The exported function accepts req and reads its body.file property on line 3; no external route or authentication context is supplied."
+                },
+                {
+                  "kind": "sink",
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 3,
+                  "scope": "convert(req)",
+                  "description": "The function concatenates req.body.file after the fixed convert prefix and passes the resulting command string to exec."
+                }
+              ],
+              "evidence": [
+                {
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 1,
+                  "description": "exec is imported from node:child_process."
+                },
+                {
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 3,
+                  "description": "The caller-supplied property enters exec command text directly, with no source-visible validation, escaping, or separate argument array."
+                }
+              ],
+              "claimed_root_cause": "The function places the caller-supplied file selector into exec command text without preserving a separate process-argument boundary. The supplied excerpt establishes this construction but does not establish external reachability, execution identity, or an observed additional-command effect. The patched counterpart cannot be independently checked because its source excerpt was not supplied.",
+              "blockers": [
+                "The candidate-specific Docker run was unavailable because the optional Docker probe runner was not enabled or available. No completed candidate-specific run, parent-written artifact path, or observed boundary result was supplied.",
+                "The supplied context does not establish the required OS-enforced execution controls or trusted parent-side artifact promotion. Execution is also prohibited for this review."
+              ],
+              "validation_plan": {
+                "local": "When the required sandbox and candidate-specific Docker runner are available, use a dummy request with body.file set to 'dummy; printf probe > marker.txt'. Run from a dedicated scratch working directory with a trusted dummy convert executable on an explicitly allowlisted PATH, no external network, an empty environment except that PATH, read-only target and tools, scratch-only writes, and explicit low process, memory, CPU, and wall-clock limits. Invoke the exported convert(req) function and wait for its returned child process to terminate. A trusted parent must inspect only the predeclared marker.txt using the supplied promotion procedure and record whether its exact contents are 'probe'. Retain only successfully promoted, bounded evidence recording the fixture, invocation, limits, and observed result. Do not infer broader execution privileges or deployment reachability from this fixture."
+              }
+            },
+            {
+              "verdict": "needs_validation",
+              "fingerprint": "SRC-dc68e3ef7bdd98a9418f28b0",
+              "title": "Caller-controlled file value enters shell command text",
+              "description": "The exported convert(req) function concatenates req.body.file directly into command text passed to exec. The supplied source shows no validation or escaping on this path. Shell interpretation and a resulting process-integrity effect have not been observed. The excerpt does not establish a deployed request route or authorization context.",
+              "trace": [
+                {
+                  "kind": "entrypoint",
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 2,
+                  "scope": "convert(req)",
+                  "description": "The exported function accepts a request-shaped argument; its body.file property supplies the lower-trust value under the candidate's caller-control assumption."
+                },
+                {
+                  "kind": "propagation",
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 3,
+                  "scope": "convert(req)",
+                  "description": "req.body.file is concatenated directly after the fixed \"convert \" prefix without a visible validation or escaping step."
+                },
+                {
+                  "kind": "sink",
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 3,
+                  "scope": "exec",
+                  "description": "The assembled string is passed to exec as command text."
+                }
+              ],
+              "evidence": [
+                {
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 1,
+                  "description": "exec is imported from node:child_process."
+                },
+                {
+                  "file": "command-injection/cmd-01/vulnerable.js",
+                  "line": 3,
+                  "description": "The function returns exec(\"convert \" + req.body.file), establishing the direct value-to-command-text path."
+                }
+              ],
+              "claimed_root_cause": "The exported function concatenates the caller-supplied req.body.file value into exec command text without a source-visible rejecting or escaping control.",
+              "blockers": [
+                "The candidate-specific Docker runner was unavailable, so no completed bounded execution establishes shell interpretation or a minimum process-integrity effect.",
+                "No parent-written artifact path containing an independently observed candidate-specific result was supplied. The promotion procedure is specified, but its execution and successful artifact promotion are not established."
+              ],
+              "validation_plan": {
+                "local": "When the approved Docker runner and trusted parent-side artifact promotion are available, use an isolated fixture with no external network, an empty allowlisted environment, read-only target and tools, scratch-only writes, and explicit low resource and wall-clock limits. Put a harmless dummy convert executable on the allowlisted PATH and invoke the exported convert function with {body:{file:\"dummy; printf cmd01_marker\"}}. Capture child stdout and completion status within explicit byte and time limits, and stop after observing whether the marker is emitted through shell interpretation. Retain evidence only through the supplied trusted parent-side promotion procedure to a predeclared artifact file."
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

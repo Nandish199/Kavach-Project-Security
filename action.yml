@@ -1,0 +1,98 @@
+name: Kavach Security Review
+description: Run Kavach on a local checkout and produce SARIF 2.1.0.
+inputs:
+  path:
+    description: Project folder inside the checked-out workspace.
+    required: false
+    default: .
+  sarif-file:
+    description: SARIF result path relative to the workspace.
+    required: false
+    default: .kavach/kavach.sarif.json
+  fail-on:
+    description: CI threshold (confirmed, high, critical, or never).
+    required: false
+    default: confirmed
+  profile:
+    description: Audit profile (quick, standard, or deep).
+    required: false
+    default: quick
+  budget:
+    description: Maximum model-call budget, from 12 to 512.
+    required: false
+  provider:
+    description: Optional configured provider (ollama, mlx, codex, or gemini-cli).
+    required: false
+  model:
+    description: Model ID required when provider is set.
+    required: false
+  model-base:
+    description: Loopback Ollama or MLX server URL for a self-hosted runner.
+    required: false
+  osv:
+    description: Query OSV with exact dependency versions.
+    required: false
+    default: "false"
+  docker-probes:
+    description: Enable candidate-specific probes when a pinned Docker image is already installed.
+    required: false
+    default: "false"
+  confirmed-only:
+    description: Exclude unconfirmed source leads from SARIF.
+    required: false
+    default: "false"
+  require-complete:
+    description: Return exit code 3 when the six-phase review is incomplete.
+    required: false
+    default: "false"
+outputs:
+  exit-code:
+    description: Kavach policy exit code (0 success, 1 threshold reached, 2 runtime error, 3 incomplete).
+    value: ${{ steps.scan.outputs.exit-code }}
+runs:
+  using: composite
+  steps:
+    - name: Set up Node.js 22
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+    - name: Install Kavach runtime dependencies
+      shell: bash
+      env:
+        KAVACH_ACTION_PATH: ${{ github.action_path }}
+      run: npm ci --prefix "$KAVACH_ACTION_PATH" --ignore-scripts --no-audit --no-fund
+    - id: scan
+      name: Scan project and write SARIF
+      shell: bash
+      env:
+        KAVACH_ACTION_PATH: ${{ github.action_path }}
+        KAVACH_WORKSPACE: ${{ github.workspace }}
+        KAVACH_SCAN_PATH: ${{ inputs.path }}
+        KAVACH_SARIF_FILE: ${{ inputs.sarif-file }}
+        KAVACH_FAIL_ON: ${{ inputs.fail-on }}
+        KAVACH_PROFILE: ${{ inputs.profile }}
+        KAVACH_BUDGET: ${{ inputs.budget }}
+        KAVACH_PROVIDER: ${{ inputs.provider }}
+        KAVACH_MODEL: ${{ inputs.model }}
+        KAVACH_MODEL_BASE: ${{ inputs.model-base }}
+        KAVACH_OSV: ${{ inputs.osv }}
+        KAVACH_DOCKER_PROBES: ${{ inputs.docker-probes }}
+        KAVACH_CONFIRMED_ONLY: ${{ inputs.confirmed-only }}
+        KAVACH_REQUIRE_COMPLETE: ${{ inputs.require-complete }}
+      run: |
+        set +e
+        args=("$KAVACH_ACTION_PATH/kavach-cli.mjs" scan "$KAVACH_WORKSPACE/$KAVACH_SCAN_PATH" \
+          --profile "$KAVACH_PROFILE" \
+          --fail-on "$KAVACH_FAIL_ON" \
+          --sarif "$KAVACH_WORKSPACE/$KAVACH_SARIF_FILE")
+        if [[ -n "$KAVACH_BUDGET" ]]; then args+=(--budget "$KAVACH_BUDGET"); fi
+        if [[ -n "$KAVACH_PROVIDER" ]]; then args+=(--provider "$KAVACH_PROVIDER" --model "$KAVACH_MODEL"); fi
+        if [[ -n "$KAVACH_MODEL_BASE" ]]; then args+=(--model-base "$KAVACH_MODEL_BASE"); fi
+        if [[ "$KAVACH_OSV" == "true" ]]; then args+=(--osv); fi
+        if [[ "$KAVACH_DOCKER_PROBES" == "true" ]]; then args+=(--docker-probes); fi
+        if [[ "$KAVACH_CONFIRMED_ONLY" == "true" ]]; then args+=(--confirmed-only); fi
+        if [[ "$KAVACH_REQUIRE_COMPLETE" == "true" ]]; then args+=(--require-complete); fi
+        node "${args[@]}"
+        status=$?
+        echo "exit-code=$status" >> "$GITHUB_OUTPUT"
+        exit 0

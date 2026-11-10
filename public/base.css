@@ -1,0 +1,104 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Cobalt (deal 3/3, seed project-security-review-workspace-bcf7·47cf1ee6·2026-11-07·r0) · redesign: full
+ * nav: top command bar + status ledger · signature: cut-corner source workbench & ruled coverage ledger · states: default, hover, focus, active, disabled, loading, empty, error
+ * axes: light/grotesk-sans/cool · posture: restrained · contrast: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V4 · weakest: V, locked to DESIGN.md Cobalt palette; recomposed into cut-corner workbench, keycap controls, 8x16 cell field, and full-width ruled evidence ledger */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { min-width: 320px; overflow-x: clip; }
+html {
+  background: var(--color-paper-2);
+  scrollbar-color: var(--color-muted) var(--color-paper-2);
+  scroll-padding-top: var(--space-3xl);
+  scroll-behavior: auto;
+}
+body {
+  margin: 0;
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  caret-color: var(--color-accent);
+}
+::selection {
+  background: var(--color-accent-wash);
+  color: var(--color-ink);
+}
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+a {
+  color: inherit;
+  text-decoration-color: var(--color-rule-2);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+a:hover {
+  text-decoration-color: var(--color-accent);
+}
+h1, h2, h3, h4 {
+  margin: 0;
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  font-synthesis: none;
+  letter-spacing: var(--tracking-display);
+  line-height: 1.12;
+  overflow-wrap: break-word;
+  min-width: 0;
+  text-wrap: balance;
+}
+h1 { max-width: 24ch; font-size: var(--text-display); }
+h2 { max-width: 32ch; font-size: var(--text-section); }
+h3 { max-width: 44ch; font-size: var(--text-title); font-weight: 500; line-height: 1.25; }
+h4 { max-width: 48ch; font-size: var(--text-md); font-weight: 600; line-height: 1.3; }
+p { margin: 0; text-wrap: pretty; }
+p:not([class]) { max-width: 65ch; }
+img, video { max-width: 100%; height: auto; display: block; }
+svg { display: block; }
+[hidden], .hidden { display: none !important; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { min-height: 40px; }
+button:disabled, input:disabled, select:disabled, textarea:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+.num, .figure, td.num { font-variant-numeric: tabular-nums; }
+@media (max-width: 60rem) {
+  :root {
+    --gutter: 20px;
+    --section-gap-s: 24px;
+    --section-gap: 32px;
+    --section-gap-l: 48px;
+  }
+}
+@media (max-width: 40rem) {
+  :root {
+    --gutter: 16px;
+    --gap-columns: 16px;
+    --section-gap-s: 20px;
+    --section-gap: 24px;
+    --section-gap-l: 36px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *:not(.keep-motion), *:not(.keep-motion)::before, *:not(.keep-motion)::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

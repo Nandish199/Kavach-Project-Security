@@ -1,0 +1,42 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedInOwner(userId) {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.uid == userId;
+    }
+
+    function validPreferences() {
+      let prefs = request.resource.data.preferences;
+      return prefs is map
+        && prefs.keys().hasAll(['provider', 'modelBase', 'model', 'useLocalModel', 'checkOsv', 'runDockerTests'])
+        && prefs.keys().hasOnly(['provider', 'modelBase', 'model', 'useLocalModel', 'checkOsv', 'runDockerTests'])
+        && prefs.provider in ['ollama', 'mlx', 'apple-fm', 'codex', 'gemini-cli']
+        && prefs.modelBase is string && prefs.modelBase.size() <= 512
+        && prefs.model is string && prefs.model.size() <= 160
+        && prefs.useLocalModel is bool
+        && prefs.checkOsv is bool
+        && prefs.runDockerTests is bool;
+    }
+
+    function validProfile(userId) {
+      return request.resource.data.keys().hasAll(['uid', 'preferences'])
+        && request.resource.data.keys().hasOnly(['uid', 'preferences'])
+        && request.resource.data.uid == userId
+        && validPreferences();
+    }
+
+    match /fieldnoteProfiles/{userId} {
+      allow get: if signedInOwner(userId);
+      allow list: if false;
+      allow create: if signedInOwner(userId) && validProfile(userId);
+      allow update: if signedInOwner(userId) && validProfile(userId);
+      allow delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

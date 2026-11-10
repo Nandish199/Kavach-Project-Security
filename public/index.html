@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Review public Git repositories and local project folders for known dependency vulnerabilities and source-level security leads.">
+    <meta name="theme-color" content="#f3f6fb">
+    <title>Kavach: Project Security Review</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/hallmark-refresh.css">
+    <script type="module" src="/app.js?v=provider-state-sync-1"></script>
+  </head>
+  <body>
+    <section class="auth-gate" id="auth-gate" aria-labelledby="auth-title">
+      <div class="auth-card">
+        <a class="brand auth-brand" href="#" aria-label="Kavach home">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span class="brand-copy"><strong class="wordmark">KAVACH</strong><small>Project Security Review</small></span>
+        </a>
+        <h1 id="auth-title">Sign in to your workspace</h1>
+        <p class="intro-lede">Use your Firebase account to open saved reviews and start a new project safety review.</p>
+        <form id="auth-form" class="auth-form">
+          <label class="auth-label" for="auth-email">Email address</label>
+          <input id="auth-email" class="text-field" type="email" autocomplete="email" required maxlength="320" placeholder="you@example.com">
+          <label class="auth-label" for="auth-password">Password</label>
+          <input id="auth-password" class="text-field" type="password" autocomplete="current-password" required minlength="8" maxlength="128" placeholder="At least 8 characters">
+          <div class="auth-message" id="auth-message" role="status" aria-live="polite">Checking Firebase configuration…</div>
+          <button class="button button-primary auth-submit" id="auth-submit" type="submit" disabled>Continue</button>
+          <button class="auth-reset" id="auth-reset" type="button" disabled>Forgot your password?</button>
+          <button class="auth-mode-toggle" id="auth-mode-toggle" type="button" disabled>Create an account</button>
+        </form>
+        <p class="auth-footnote"><span class="lock-icon" aria-hidden="true"></span> Review reports stay in PostgreSQL on this device. Firestore stores account preferences only.</p>
+      </div>
+      <aside class="auth-side-note" aria-label="How Kavach reviews a project">
+        <div class="auth-side-meta"><span>Kavach / review path</span><span class="auth-local-tag"><i aria-hidden="true"></i> Local workspace</span></div>
+        <div class="auth-side-copy"><p>Find risks.<br>Review evidence.</p><span>Each report carries its evidence, open questions, and next steps.</span></div>
+        <div class="auth-flow" aria-label="Review stages">
+          <div class="auth-flow-step"><span>01</span><strong>Map source</strong></div>
+          <div class="auth-flow-step"><span>02</span><strong>Check leads</strong></div>
+          <div class="auth-flow-step"><span>03</span><strong>Write report</strong></div>
+        </div>
+      </aside>
+    </section>
+
+    <div class="app-shell hidden" id="app-shell">
+      <aside class="sidebar" aria-label="Workspace navigation">
+        <a class="brand" href="#review" aria-label="Kavach home">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span class="brand-copy"><strong class="wordmark">KAVACH</strong><small>Project Security Review</small></span>
+        </a>
+
+        <nav class="nav-list">
+          <button class="nav-item active" type="button" data-view="review" aria-current="page">
+            <span class="nav-icon icon-scan" aria-hidden="true"></span><span>New review</span><span class="nav-shortcut">01</span>
+          </button>
+          <button class="nav-item" type="button" data-view="reports">
+            <span class="nav-icon icon-report" aria-hidden="true"></span><span>Reports</span><span class="nav-count" id="report-count">0</span>
+          </button>
+          <button class="nav-item" type="button" data-view="method">
+            <span class="nav-icon icon-method" aria-hidden="true"></span><span>Audit method</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-spacer"></div>
+        <div class="side-method">
+          <div class="side-method-top"><span>Local workspace</span></div>
+          <strong>Source files stay here; model choice controls prompt sharing.</strong>
+          <p>Optional CVE lookup sends package coordinates to OSV. Code is never sent there.</p>
+        </div>
+        <div class="sidebar-foot">
+          <span class="foot-mark">F.</span>
+          <span><strong>Find risks. Review evidence.</strong><small>Ollama, MLX, Codex, Gemini, OSV</small></span>
+        </div>
+      </aside>
+
+      <main class="main-area">
+        <header class="topbar">
+          <div class="breadcrumbs"><span>Workspace</span><i>/</i><strong id="breadcrumb-current">New review</strong></div>
+          <div class="topbar-right">
+            <span class="topbar-secure"><span class="lock-icon" aria-hidden="true"></span> <span id="privacy-status">Local model selected</span></span>
+            <span class="topbar-divider"></span>
+            <div class="service-status" aria-live="polite"><span id="postgres-status" class="service-pill">PostgreSQL: checking</span><span id="firestore-status" class="service-pill">Firestore: checking</span><span id="docker-status" class="service-pill">Docker: checking</span></div>
+            <span id="signed-in-email" class="signed-in-email"></span>
+            <button class="text-button sign-out-button" id="sign-out" type="button">Sign out</button>
+            <span class="topbar-divider"></span>
+            <button class="help-link" type="button" data-view="method">How it works</button>
+          </div>
+        </header>
+
+        <section class="workspace-view" id="view-review">
+          <div class="intro-grid">
+            <div class="intro-copy">
+              <h1>Review a project</h1>
+              <p class="intro-lede">Scan a local folder or public Git repository for dependency advisories and source leads. Review the evidence, limits, and report.</p>
+            </div>
+            <aside class="design-note">
+              <strong>Cloudflare audit method</strong>
+              <p>Map the source, trace trust boundaries, and record evidence with clear limits.</p>
+              <a href="https://github.com/cloudflare/security-audit-skill" target="_blank" rel="noreferrer">Read the security audit skill</a>
+            </aside>
+          </div>
+
+          <div class="workbench" id="scanner-form">
+            <div class="workbench-head">
+              <div>
+                <h2>Choose your source</h2>
+              </div>
+              <div class="sequence-stamp"><span>Step</span><strong>1</strong><span>of 3</span></div>
+            </div>
+
+            <div class="source-tabs" role="tablist" aria-label="Project source">
+              <button class="source-tab active" type="button" id="tab-git" role="tab" aria-selected="true" aria-controls="source-git" data-source-tab="git"><span class="tab-index">A</span><span>Git repository</span></button>
+              <button class="source-tab" type="button" id="tab-folder" role="tab" aria-selected="false" aria-controls="source-folder" data-source-tab="folder"><span class="tab-index">B</span><span>Local project folder</span></button>
+            </div>
+
+            <div class="source-panel" id="source-git" role="tabpanel" aria-labelledby="tab-git">
+              <label class="field-label" for="git-url">Public HTTPS repository URL</label>
+              <div class="url-field-wrap">
+                <span class="url-prefix" aria-hidden="true">URL</span>
+                <input id="git-url" class="text-field git-field" type="url" spellcheck="false" autocomplete="url" placeholder="https://github.com/owner/project" aria-describedby="git-help">
+                <span class="field-state">Ready to fetch</span>
+              </div>
+              <div class="field-footer" id="git-help"><span>Public GitHub, GitLab or Bitbucket repositories</span><span>Shallow fetch / 100 MB temporary workspace, cleared after the report</span></div>
+            </div>
+
+            <div class="source-panel hidden" id="source-folder" role="tabpanel" aria-labelledby="tab-folder">
+              <div class="folder-pick-row">
+                <div class="folder-copy"><strong id="folder-name">Bring in a project folder</strong><span id="folder-detail">Files are read on this device. Selected source checks and existing Node tests run only in Docker.</span></div>
+                <button class="button button-outline" type="button" id="choose-folder">Choose folder</button>
+                <input id="folder-input" class="visually-hidden" type="file" webkitdirectory directory multiple aria-label="Choose project folder">
+              </div>
+              <div class="field-footer"><span>Source and configuration files</span><span>Up to 8,000 files / 100 MB</span></div>
+            </div>
+
+            <details class="engine-advanced scope-filter-details" id="scope-filter-settings">
+              <summary>Branch &amp; subpath filter <span id="scope-summary-note">Optional</span></summary>
+              <div class="scope-filter-grid">
+                <label class="engine-select-label" id="git-branch-wrap" for="git-branch">Git branch or tag (optional)
+                  <input id="git-branch" type="text" class="text-field" maxlength="120" spellcheck="false" placeholder="Default branch (e.g. main)">
+                </label>
+                <label class="engine-select-label" for="scope-subpaths">Target subpath filter (optional, comma-separated)
+                  <input id="scope-subpaths" type="text" class="text-field" maxlength="400" spellcheck="false" placeholder="e.g. src/api, packages/auth">
+                </label>
+              </div>
+            </details>
+
+            <div class="rule-divider"></div>
+
+            <div class="review-settings">
+              <div class="settings-title">
+                <div><h3>Source review model</h3></div>
+                <label class="switch-label" for="use-local-model"><input id="use-local-model" type="checkbox" checked><span class="switch"></span><span>Include model review</span></label>
+              </div>
+              <div class="engine-row">
+                <label class="engine-select-label" for="provider-select">Model provider
+                  <select id="provider-select" class="select-field"><option value="ollama">Ollama (local)</option><option value="mlx">Apple MLX (local)</option><option value="apple-fm">Apple Foundation Models (local)</option><option value="codex">Codex CLI</option><option value="gemini-cli">Gemini CLI</option></select>
+                </label>
+                <label class="engine-select-label model-field" for="model-select"><span id="model-label">Available model</span>
+                  <select id="model-select" class="select-field"><option value="">Connect to load models</option></select>
+                </label>
+                <button class="text-button refresh-models" type="button" id="refresh-models">Refresh models</button>
+              <span class="engine-status" id="engine-status"><span>Checking model provider</span></span>
+              </div>
+              <p class="engine-note" id="engine-note">Choose an installed local model or a signed-in CLI to write the six-phase security review.</p>
+              <p class="model-data-note" id="model-data-note" role="status"></p>
+              <details class="engine-advanced" id="local-model-settings">
+                <summary>Local server address <span id="engine-address">127.0.0.1:11434</span></summary>
+                <div class="advanced-row">
+                  <label for="model-base">Loopback address only</label>
+                  <input id="model-base" type="url" class="text-field" value="http://127.0.0.1:11434" spellcheck="false">
+                  <p>Only direct loopback addresses are accepted. MLX uses port 8080; Apple Foundation Models uses port 11437.</p>
+                </div>
+              </details>
+            </div>
+
+            <div class="audit-plan-row">
+              <div class="audit-plan-copy"><strong>Cloudflare audit workflow</strong><span>Choose review breadth and a cap on model calls. Any work left at the cap appears as incomplete.</span></div>
+              <div class="audit-plan-controls">
+                <label class="engine-select-label" for="audit-profile">Profile
+                  <select id="audit-profile" class="select-field"><option value="quick">Quick: one hunt wave</option><option value="standard" selected>Standard: repeat until clean</option><option value="deep">Deep: recheck prior coverage</option></select>
+                </label>
+                <label class="engine-select-label" for="audit-budget">Model-call limit
+                  <input id="audit-budget" class="select-field" type="number" min="12" max="512" step="1" value="128" inputmode="numeric">
+                </label>
+              </div>
+            </div>
+
+            <div class="lookup-row">
+              <div class="lookup-icon" aria-hidden="true">ID</div>
+              <div class="lookup-copy"><strong>Match dependency versions to known CVEs</strong><span>OSV receives package names, ecosystems and versions only.</span></div>
+              <label class="check-label"><input id="check-osv" type="checkbox" checked><span>Check OSV</span></label>
+            </div>
+
+            <div class="lookup-row sandbox-option-row">
+              <div class="lookup-icon docker-icon" aria-hidden="true">D</div>
+              <div class="lookup-copy"><strong>Run source checks and existing Node.js tests in Docker</strong><span>Up to eight candidate checks and eight existing tests; no network, installs or builds.</span></div>
+              <label class="check-label"><input id="run-docker-tests" type="checkbox" checked><span>Use Docker</span></label>
+            </div>
+
+            <div class="submit-row">
+              <div class="submit-privacy"><span class="lock-icon" aria-hidden="true"></span><span>Source review runs locally. Docker source copies use the remaining 100 MB temporary space and are removed after the review.</span></div>
+              <button class="button button-primary" id="start-scan" type="button">Review project</button>
+            </div>
+            <div class="form-error hidden" id="scan-error" role="alert"></div>
+          </div>
+
+          <div class="bottom-grid">
+            <div class="assurance-block">
+              <span class="section-kicker">Review coverage</span>
+              <div class="assurance-list">
+                <div><span class="assurance-num">01</span><strong>Source boundaries</strong><small>Input, access, injection, secrets</small></div>
+                <div><span class="assurance-num">02</span><strong>Dependency versions</strong><small>Lockfiles matched to OSV records</small></div>
+                <div><span class="assurance-num">03</span><strong>Evidence & gaps</strong><small>File, line, confidence and limits</small></div>
+              </div>
+            </div>
+            <div class="coverage-callout">
+              <div><strong>Every report has edges.</strong><p>A source-only review can surface leads. It cannot certify that a project is safe or prove a runtime exploit.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="workspace-view hidden" id="view-progress" aria-live="polite">
+          <div class="progress-page">
+            <div class="progress-head">
+              <div>
+                <h1>Review in progress</h1>
+                <p class="intro-lede" id="progress-source">Preparing your source…</p>
+              </div>
+              <button class="button button-outline" id="cancel-scan" type="button">Stop review</button>
+            </div>
+            <div class="progress-track"><progress class="progress-track-fill" id="progress-fill" max="100" value="6" aria-label="Review progress"></progress></div>
+            <div class="progress-meta"><span id="progress-stage">Preparing</span><span id="progress-count">Waiting</span></div>
+            <div class="progress-note"><span id="progress-message">Mapping files and dependencies. Optional tests run only in Docker.</span></div>
+            <div class="phase-strip">
+              <div class="phase active" data-phase="reconnaissance"><span>01</span><strong>Map trust</strong></div>
+              <div class="phase" data-phase="hunting"><span>02</span><strong>Hunt by coverage</strong></div>
+              <div class="phase" data-phase="validation"><span>03</span><strong>Validate leads</strong></div>
+              <div class="phase" data-phase="structured"><span>04</span><strong>Structure records</strong></div>
+              <div class="phase" data-phase="verification"><span>05</span><strong>Verify records</strong></div>
+              <div class="phase" data-phase="report"><span>06</span><strong>Write report</strong></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="workspace-view hidden" id="view-report" aria-live="polite">
+          <div id="report-content"></div>
+        </section>
+
+        <section class="workspace-view hidden" id="view-reports">
+          <div class="page-heading">
+            <h1>Reports</h1>
+            <p class="intro-lede">Saved review reports from this account. Source files are not stored in the report history.</p>
+            <button class="text-button" id="open-latest-report" type="button">Open latest report</button>
+          </div>
+          <div class="reports-list" id="reports-list"></div>
+        </section>
+
+        <section class="workspace-view hidden" id="view-method">
+          <div class="page-heading method-heading">
+            <h1>Audit method</h1>
+            <p class="intro-lede">Kavach adapts the source-first principles of Cloudflare’s security audit skill for a single-device workspace, with local models and signed-in CLI choices.</p>
+          </div>
+          <div class="method-sheet">
+            <div class="method-sheet-head"><span class="section-kicker">Cloudflare security audit, six phases</span><span class="sequence-stamp"><span>Phases</span><strong>6</strong></span></div>
+            <ol class="method-steps">
+              <li class="method-step"><div><h2>Reconnaissance</h2><p>Four fresh model passes map the product and stack, principals and trust boundaries, source entry points and sinks, and safe local-check options. Kavach loads prior same-source ledgers from PostgreSQL, compares per-file hashes, selects matching Cloudflare companion guidance, and creates the coverage plan.</p></div><span class="method-tag">Source map</span></li>
+              <li class="method-step"><div><h2>Coverage-led hunting</h2><p>Reviewers work through the source-derived surface × boundary × subsystem × attack-class ledger. A post-wave critic finds omissions and reassigns work. Standard and Deep repeat waves until a distinct final-clean critic accepts coverage or the call budget is reached; Quick uses one wave and its final critic.</p></div><span class="method-tag">Coverage loop</span></li>
+              <li class="method-step"><div><h2>Validate each candidate</h2><p>A fresh reviewer re-reads each candidate and tries to disprove the trace. When Docker is enabled, Kavach may run up to eight small, candidate-specific Node checks against a read-only copy of the scanned files. Confirmation requires a completed result that supports the exact claim.</p></div><span class="method-tag">Refutation</span></li>
+              <li class="method-step"><div><h2>Validate structured records</h2><p>Kavach validates findings against Cloudflare’s vendored report schema and runs the official findings and coverage-ledger validators after ledger or record changes. Invalid records stay unresolved in the report.</p></div><span class="method-tag">Schema check</span></li>
+              <li class="method-step"><div><h2>Independently verify records</h2><p>Standard and Deep use a separate fresh reviewer for every retained candidate. Quick combines this check with candidate validation using the same verifier, as Cloudflare specifies. A material replacement in Standard or Deep requires another fresh review and schema validation.</p></div><span class="method-tag">Final review</span></li>
+              <li class="method-step"><div><h2>Write and package the report</h2><p>The selected model provider writes the target-neutral posture and coverage summary from validated facts. Kavach creates the architecture map, exact coverage ledger, findings, confirmed details and needs-validation handoff for Markdown, PDF print, SARIF, or ZIP download.</p></div><span class="method-tag">Report files</span></li>
+            </ol>
+            <div class="method-limit"><p><strong>Workflow fidelity and evidence limits.</strong> Kavach implements all six phases and vendors the Cloudflare skill and its validators. Reviewer roles are fresh, stateless prompts to the selected model provider, not separate delegated model agents. Hosted providers receive selected source excerpts for processing. Candidate probes run only when Docker is enabled and available; they support self-contained Node.js checks and do not install dependencies, build the project, or contact services. The parent retains bounded, redacted output after each container exits. The official skill’s per-agent scratch-directory handoff is not implemented. Source-only and unresolved candidates remain needs validation, and a complete workflow is not a safety certificate.</p></div>
+            <a class="source-link" href="https://github.com/cloudflare/security-audit-skill" target="_blank" rel="noreferrer">Read the original Cloudflare skill</a>
+          </div>
+        </section>
+
+        <footer class="main-footer"><span>Kavach, local project security</span><span>Find risks. Review evidence.</span></footer>
+      </main>
+    </div>
+  </body>
+</html>

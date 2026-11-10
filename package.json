@@ -1,0 +1,23 @@
+{
+  "name": "kavach-project-security",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "scan": "node kavach-cli.mjs scan",
+    "benchmark": "node benchmarks/run.mjs",
+    "test": "node --test"
+  },
+  "bin": {
+    "kavach": "./kavach-cli.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.9",
+    "firebase-admin": "^14.5.0",
+    "pg": "^8.23.1"
+  }
+}

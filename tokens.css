@@ -1,0 +1,122 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Cobalt (deal 3/3, seed project-security-review-workspace-bcf7·47cf1ee6·2026-11-07·r0) · redesign: full
+ * nav: top command bar + status ledger · signature: cut-corner source workbench & ruled coverage ledger · states: default, hover, focus, active, disabled, loading, empty, error
+ * axes: light/grotesk-sans/cool · posture: restrained · contrast: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V4 · weakest: V, locked to DESIGN.md Cobalt palette; recomposed into cut-corner workbench, keycap controls, 8x16 cell field, and full-width ruled evidence ledger */
+:root {
+  color-scheme: light;
+  --space-3xs: 2px;
+  --space-2xs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-20: 20px;
+  --space-lg: 24px;
+  --space-28: 28px;
+  --space-32: 32px;
+  --space-36: 36px;
+  --space-xl: 40px;
+  --space-48: 48px;
+  --space-2xl: 64px;
+  --space-3xl: 96px;
+  --space-4xl: 144px;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-md: 0.875rem;
+  --text-lg: 1rem;
+  --text-xl: 1.125rem;
+  --text-2xl: 1.375rem;
+  --text-3xl: 1.75rem;
+  --text-display-s: 1.5rem;
+  --text-display: 1.875rem;
+  --text-section: 1.25rem;
+  --text-title: 1rem;
+  --text-lead: 0.9375rem;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms;
+  --dur-short: 220ms;
+  --dur-long: 420ms;
+
+  --container: 1360px;
+  --gutter: 32px;
+  --gap-columns: 24px;
+  --section-gap-s: 32px;
+  --section-gap: 48px;
+  --section-gap-l: 64px;
+
+  --z-base: 1;
+  --z-raised: 10;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-sticky-nav: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+  --z-tooltip: 600;
+
+  --color-paper: oklch(98.6% 0.005 250);
+  --color-paper-2: oklch(96.2% 0.008 252);
+  --color-paper-3: oklch(93% 0.011 252);
+  --color-ink: oklch(21% 0.028 262);
+  --color-ink-2: oklch(34% 0.022 260);
+  --color-muted: oklch(44% 0.018 258);
+  --color-rule: oklch(89% 0.010 252);
+  --color-rule-2: oklch(80% 0.014 252);
+
+  --color-graphite: oklch(21% 0.024 262);
+  --color-graphite-2: oklch(26.5% 0.026 262);
+  --color-graphite-ink: oklch(95% 0.008 250);
+  --color-graphite-muted: oklch(76% 0.018 256);
+
+  --color-accent: oklch(48% 0.19 258);
+  --color-accent-2: oklch(76% 0.13 254);
+  --color-accent-wash: oklch(95% 0.028 256);
+  --color-accent-ink: oklch(98.6% 0.005 250);
+  --color-focus: oklch(48% 0.19 258);
+  --color-accent-deep: oklch(40% 0.20 262);
+  --color-accent-edge: oklch(36% 0.16 260);
+
+  --color-glyph-1: oklch(89% 0.025 254);
+  --color-glyph-2: oklch(81% 0.045 255);
+  --color-glyph-3: oklch(70% 0.085 256);
+  --color-glyph-4: oklch(60% 0.13 257);
+  --color-graphite-glyph-1: oklch(33% 0.03 262);
+  --color-graphite-glyph-2: oklch(41% 0.05 260);
+  --color-graphite-glyph-3: oklch(53% 0.1 258);
+
+  --color-key-face: oklch(99.2% 0.004 250);
+  --color-key-edge: oklch(79% 0.016 254);
+
+  --color-error: oklch(46% 0.18 27);
+  --color-error-wash: oklch(96% 0.024 27);
+  --color-amber: oklch(46% 0.13 72);
+  --color-amber-wash: oklch(96.5% 0.028 82);
+  --color-success: oklch(44% 0.12 152);
+  --color-success-wash: oklch(96% 0.024 152);
+  --color-signal-lime: oklch(88% 0.20 128);
+
+  --font-display: "Familjen Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-body: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-outlier: "JetBrains Mono", "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+
+  --radius-card: 8px;
+  --radius-input: 6px;
+  --radius-tight: 4px;
+  --radius-pill: 999px;
+
+  --cell-w: 8px;
+  --cell-h: 16px;
+  --cut: 8px;
+  --cut-l: 14px;
+  --rule-hair: 1px;
+
+  --shadow-card: 0 1px 2px oklch(21% 0.028 262 / 0.06);
+  --shadow-key: 0 2px 0 0 var(--color-key-edge), 0 4px 8px -4px oklch(21% 0.028 262 / 0.22), inset 0 1px 0 oklch(100% 0 0 / 0.88);
+  --shadow-key-accent: 0 2px 0 0 var(--color-accent-edge), 0 4px 10px -4px oklch(30% 0.12 260 / 0.42), inset 0 1px 0 oklch(100% 0 0 / 0.22);
+  --shadow-key-press: inset 0 1px 2px oklch(21% 0.028 262 / 0.16);
+
+  --tracking-display: -0.028em;
+  --display-weight: 600;
+}

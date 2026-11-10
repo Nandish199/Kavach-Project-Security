@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+.DS_Store
+node_modules/
+.fieldnote-postgres/
+.kavach/
+.firebase/
+*.log
+*service-account*.json
+*-firebase-adminsdk-*.json
