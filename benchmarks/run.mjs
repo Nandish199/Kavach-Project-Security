@@ -154,19 +154,25 @@ function markdownReport(output) {
     `- Provider/model: ${output.configuration.provider || "deterministic-only"} / ${output.configuration.model || "static-rules"}`,
     `- Profile/budget: ${output.configuration.profile} / ${output.configuration.budget ?? "profile default"}`,
     `- Repeated runs: ${output.runs.length}`, "",
-    "This is a pilot corpus. A retained lead is counted against its expected vulnerable sink; any lead on a patched fixture counts as a false positive. Refuted records are excluded after Refutation. Review the fixture labels and raw snapshots before making a public claim.", "",
+    "This is a pilot corpus. A retained lead is counted against its expected vulnerable sink; any lead on a patched fixture counts as a false positive. Refuted records are excluded after Refutation. Phase 1, Phase 4, and Phase 6 are workflow/reporting phases rather than candidate-detection stages, so their candidate metrics are n/a. Review the fixture labels and raw snapshots before making a public claim.", "",
     "| Stage | Candidates | Precision | Recall | F1 | False positives | False negatives |",
     "|---|---:|---:|---:|---:|---:|---:|"
   ];
   const stageRows = [
     ["Deterministic regex baseline (Phase 0)", "deterministic_baseline"],
+    ["Reconnaissance (Phase 1)", null],
     ["Hunt (Phase 2)", "hunt"],
     ["Refutation (Phase 3)", "refutation"],
-    ["Independent verification (Phase 5)", "independent_verification"]
+    ["Structured output (Phase 4)", null],
+    ["Independent verification (Phase 5)", "independent_verification"],
+    ["Target-neutral reporting (Phase 6)", null]
   ];
   for (const [label, key] of stageRows) {
-    const metrics = output.aggregate[key];
-    if (!metrics) continue;
+    const metrics = key ? output.aggregate[key] : null;
+    if (!metrics) {
+      lines.push(`| ${label} | n/a | n/a | n/a | n/a | n/a | n/a |`);
+      continue;
+    }
     lines.push(`| ${label} | ${Number.isFinite(metrics.candidates) ? metrics.candidates : "n/a"} | ${metrics.precision === null ? "n/a" : (metrics.precision * 100).toFixed(1) + "%"} | ${metrics.recall === null ? "n/a" : (metrics.recall * 100).toFixed(1) + "%"} | ${metrics.f1 === null ? "n/a" : metrics.f1.toFixed(3)} | ${Number.isFinite(metrics.false_positives) ? metrics.false_positives : "n/a"} | ${Number.isFinite(metrics.false_negatives) ? metrics.false_negatives : "n/a"} |`);
   }
   const reduction = output.aggregate.hunt_to_final_false_positive_reduction;

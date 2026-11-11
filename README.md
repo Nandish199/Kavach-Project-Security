@@ -241,14 +241,19 @@ node kavach-cli.mjs scan . --provider ollama --model qwen3:8b --diff origin/main
 
 ## Paired-Fixture Benchmark Suite
 
-[`benchmarks/fixtures.mjs`](benchmarks/fixtures.mjs) and [`benchmarks/run.mjs`](benchmarks/run.mjs) evaluate 25 paired vulnerable/patched JavaScript fixtures (50 files) across five vulnerability classes: `sql-injection`, `ssrf`, `path-traversal`, `command-injection`, and `prototype-pollution`. Results are recorded per phase and scored for precision, recall, F1, false positives, and false negatives by class. The goal is to measure how trace attribution in Phases 2 to 5 eliminates false positives that pattern matching produces on patched controls.
+[`benchmarks/fixtures.mjs`](benchmarks/fixtures.mjs) and [`benchmarks/run.mjs`](benchmarks/run.mjs) evaluate 25 paired vulnerable/patched JavaScript fixtures (50 files) across five vulnerability classes: `sql-injection`, `ssrf`, `path-traversal`, `command-injection`, and `prototype-pollution`. All six workflow phases appear in the report; precision, recall, F1, false positives, and false negatives are scored only for candidate-detection phases. The goal is to measure how trace attribution in Phases 2, 3, and 5 eliminates false positives that pattern matching produces on patched controls.
 
 | Stage | Candidates | Precision | Recall | F1 | False Positives | False Negatives |
 |---|---:|---:|---:|---:|---:|---:|
 | **Deterministic regex baseline (Phase 0)** | 17 | 82.4% | 56.0% | 0.667 | 3 | 11 |
+| **Reconnaissance (Phase 1)** | n/a | n/a | n/a | n/a | n/a | n/a |
 | **Hunt (Phase 2, pilot quick run)** | 2 | 100.0% | 4.0% | 0.077 | 0 | 24 |
 | **Refutation (Phase 3, pilot quick run)** | 2 | 100.0% | 4.0% | 0.077 | 0 | 24 |
+| **Structured output (Phase 4)** | n/a | n/a | n/a | n/a | n/a | n/a |
 | **Independent verification (Phase 5, pilot quick run)** | 2 | 100.0% | 4.0% | 0.077 | 0 | 24 |
+| **Target-neutral reporting (Phase 6)** | n/a | n/a | n/a | n/a | n/a | n/a |
+
+Phases 1, 4, and 6 are included for completeness but do not classify fixture sinks, so candidate metrics are not applicable (`n/a`). Their workflow status and raw artifacts remain available in the JSON benchmark result.
 
 - **False positives:** the 3 deterministic false positives on patched fixtures fell to 0 in the pilot quick run. That run surfaced only 2 candidates (4.0% recall), so the reduction reflects very low candidate volume as well as trace-grounded refutation. Treat it as a pilot result, not a measured detection rate. Details: [`codex-quick.md`](benchmarks/results/codex-quick.md) and [`deterministic-baseline.md`](benchmarks/results/deterministic-baseline.md).
 - **Scale:** the 25-pair corpus is an initial pilot and is not evidence of broad ecosystem coverage.
