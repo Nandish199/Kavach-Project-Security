@@ -68,7 +68,7 @@ npm run benchmark -- --provider ollama --model qwen3:8b --runs 3 --out benchmark
 
 Requirements: Node.js 22 or newer, Git, Docker Desktop (or a local Docker Engine), and a modern browser.
 
-1. Copy `.env.example` to `.env`. The Firebase settings point to the existing `matrix-abacus` project. Keep `DATABASE_URL`’s password in sync with `POSTGRES_PASSWORD` if you change it.
+1. Copy `.env.example` to `.env`, then fill in your Firebase web-app values. `.env` is ignored and must never be committed. Keep `DATABASE_URL`’s password in sync with `POSTGRES_PASSWORD` if you change it.
 2. Start the local PostgreSQL database:
 
    ```sh
@@ -90,7 +90,7 @@ The server binds only to `127.0.0.1`. Firebase Authentication and Firestore are 
 
 ## Firebase Auth and Firestore
 
-Email/password sign-in uses Firebase Authentication for project `matrix-abacus`. Accounts must verify their email. The browser keeps the Firebase sign-in session for the current browser session, and the local server verifies Firebase ID tokens before giving access to PostgreSQL history or starting a review. A pending review ID is kept in tab session storage so the same account can resume polling after signing in again; no token or source files are stored there.
+Email/password sign-in uses Firebase Authentication for the project configured in `.env`. Accounts must verify their email. The browser keeps the Firebase sign-in session for the current browser session, and the local server verifies Firebase ID tokens before giving access to PostgreSQL history or starting a review. A pending review ID is kept in tab session storage so the same account can resume polling after signing in again; no token or source files are stored there.
 
 Firestore stores one small preferences document per account at `fieldnoteProfiles/{uid}`. It contains only the selected model settings and review options. The rules allow an email-verified user to read and update only their own preferences; every other document path remains denied. Source files, findings, reports, and Git addresses are not written to Firestore.
 
@@ -195,3 +195,18 @@ Run the benchmark only with a model/provider you intend to evaluate. It makes re
 - [Gemini CLI authentication](https://github.com/google-gemini/gemini-cli/blob/main/docs/get-started/authentication.mdx)
 - [Gemini CLI headless mode](https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/tutorials/automation.md)
 - [OSV batch query API](https://google.github.io/osv.dev/post-v1-querybatch/)
+
+
+
+
+# 1. Configure environment
+cp .env.example .env
+
+# 2. Start PostgreSQL
+docker compose up -d postgres
+
+# 3. Install dependencies
+npm install
+
+# 4. Start application
+npm start
