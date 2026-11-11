@@ -2,6 +2,7 @@
 .env.*
 !.env.example
 .DS_Store
+IDEA.md
 node_modules/
 .fieldnote-postgres/
 .kavach/
