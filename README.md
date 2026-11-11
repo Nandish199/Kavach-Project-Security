@@ -11,11 +11,15 @@
 
 </div>
 
-Kavach is a local-first, static and model-assisted application security review engine. It audits local repositories or public HTTPS Git checkouts using the six-phase adversarial workflow from [Cloudflare's `security-audit` skill](https://github.com/cloudflare/security-audit-skill), runs candidate-specific reproduction probes inside network-isolated, read-only Docker sandboxes, and checks exact lockfile dependency versions against [OSV](https://google.github.io/osv.dev/post-v1-querybatch/). Results export as SARIF 2.1.0, Markdown, printable PDF, and validated coverage ledgers.
+Kavach is a local-first, static and model-assisted application security review engine. It audits local repositories or public HTTPS Git checkouts using a six-phase workflow adapted from [Cloudflare's `security-audit` skill](https://github.com/cloudflare/security-audit-skill), can run candidate-specific reproduction probes inside network-isolated, read-only Docker sandboxes, and checks exact dependency versions against [OSV](https://google.github.io/osv.dev/post-v1-querybatch/). Results can be downloaded as SARIF 2.1.0, Markdown, a browser print view that can be saved as PDF, or a ZIP bundle containing validated audit artifacts.
 
 ## Contents
 
 - [Quick Start](#quick-start)
+- [Objectives](#objectives)
+- [Technology Stack](#technology-stack)
+- [System Requirements](#system-requirements)
+- [Environment Configuration](#environment-configuration)
 - [System Architecture](#system-architecture)
 - [Key Engineering Highlights](#key-engineering-highlights)
 - [Cloudflare Workflow](#cloudflare-workflow)
@@ -23,10 +27,49 @@ Kavach is a local-first, static and model-assisted application security review e
 - [Docker Sandbox](#docker-sandbox)
 - [Firebase Auth and Firestore](#firebase-auth-and-firestore)
 - [Headless CLI and GitHub Code Scanning](#headless-cli-and-github-code-scanning)
+- [Dependency Vulnerability Detection](#dependency-vulnerability-detection)
+- [Report Outputs](#report-outputs)
 - [Incremental Scans](#incremental-scans)
 - [Paired-Fixture Benchmark Suite](#paired-fixture-benchmark-suite)
+- [Project Structure](#project-structure)
+- [Troubleshooting](#troubleshooting)
 - [Scope and Limits](#scope-and-limits)
 - [References](#references)
+
+## Objectives
+
+Kavach is intended to make a bounded, evidence-led security review available before a change is merged. Its objectives are to:
+
+- identify deterministic source-pattern leads and exact affected dependency versions;
+- use optional model-assisted source review to map coverage, trace candidates, and record unresolved evidence;
+- validate findings and coverage records against vendored contracts;
+- provide local reports and SARIF for human review and CI policy gates; and
+- keep source collection, report history, and model-provider access within explicit local boundaries.
+
+Kavach is a review aid, not a certification service. A clean or complete run does not prove that a project is safe.
+
+## Technology Stack
+
+- Node.js 22 or newer with native ECMAScript modules and npm.
+- A dependency-free browser interface served by `server.mjs` using HTML, CSS, and browser JavaScript.
+- Firebase Authentication for verified email/password sign-in and Firestore REST calls for per-account preferences.
+- Firebase Admin Authentication SDK for server-side ID-token verification.
+- PostgreSQL 16, accessed through `pg`, for local review history and coverage reuse.
+- Docker Engine or Docker Desktop for optional bounded Node test and candidate-probe execution.
+- OSV's batch and vulnerability-detail APIs for optional exact-version dependency matching.
+- Optional Ollama, Apple MLX-compatible, Apple Foundation Models-compatible, Codex CLI, or Gemini CLI model providers.
+- Vendored Cloudflare findings and coverage-ledger validators, plus SARIF 2.1.0 generation.
+
+There is no application build step, frontend bundler, or separate migration framework in this repository.
+
+## System Requirements
+
+- Node.js 22 or newer and npm.
+- A modern browser for the web interface.
+- Docker is optional for sandbox checks. When enabled, Kavach requires a local Unix-socket Docker daemon and an already-installed image; it never pulls images automatically.
+- PostgreSQL is required by the web interface for saved review history and is provided by `compose.yaml`. Headless CLI scans can run without PostgreSQL unless `--postgres-cache` is selected.
+- A Firebase project with Email/Password Authentication enabled is required for the web interface. Firestore is required only for synchronizing workspace preferences.
+- Git is required for public Git checkout scans and incremental `--diff` scans.
 
 ## Quick Start
 
@@ -48,10 +91,31 @@ npm start
 
 1. **Configure.** Open `.env` and fill in your Firebase web-app values. `.env` is git-ignored and must never be committed. If you change `POSTGRES_PASSWORD`, keep the password in `DATABASE_URL` in sync.
 2. **Database.** Docker Compose exposes PostgreSQL only on `127.0.0.1:54329`. If a local PostgreSQL server is already running, set `DATABASE_URL` to its loopback address instead.
-3. **Sandbox image.** Kavach never downloads images automatically. Pull the Node image once: `docker pull node:22-alpine`.
+3. **Sandbox image.** If Docker checks are needed, Kavach never downloads images automatically. Pull the default image once: `docker pull node:22-alpine`.
 4. **Open** [http://localhost:4173](http://localhost:4173), create a Firebase account, verify its email, then sign in.
 
 The server binds only to `127.0.0.1`. Firebase Authentication and Firestore are accessed through their REST APIs; no service-account key is required.
+
+## Environment Configuration
+
+Copy `.env.example` to `.env`. The `.env` file is ignored by Git and must not be committed. The web server reads these variables at startup:
+
+| Variable | Purpose | Default or constraint |
+|---|---|---|
+| `PORT` | Local HTTP port | `4173`; the server may try the next nine ports if it is busy |
+| `FIREBASE_PROJECT_ID` | Firebase project used for token verification | Required for web authentication |
+| `FIREBASE_API_KEY` | Firebase web client configuration | Required for browser Authentication REST calls; keep it out of Git |
+| `FIREBASE_AUTH_DOMAIN` | Firebase web client configuration | Required for a configured web client |
+| `FIREBASE_APP_ID` | Firebase web client configuration | Required for a configured web client |
+| `POSTGRES_DB` | Local PostgreSQL database name | `fieldnote` in Compose |
+| `POSTGRES_USER` | Local PostgreSQL user | `fieldnote` in Compose |
+| `POSTGRES_PASSWORD` | Local PostgreSQL password | Required by Compose; use a local secret |
+| `DATABASE_URL` | PostgreSQL connection URL | Must resolve to `localhost`, `127.0.0.1`, or `::1` |
+| `FIELDNOTE_LOCAL_MODEL_TIMEOUT_MS` | Local model request timeout | 30 seconds to 10 minutes; default 5 minutes |
+| `FIELDNOTE_OLLAMA_NUM_CTX` | Ollama context window | 2,048 to 65,536 tokens; default 8,192 |
+| `AUDIT_DOCKER_IMAGE` | Optional local Docker image reference | Defaults to `node:22-alpine`; image must already exist locally |
+
+The Firebase web API key is client configuration, not a Firebase Admin service-account credential. It is returned to the local browser by `/api/auth/config` for the Firebase Auth REST calls, but it must not be committed to this repository. Firebase restrictions and credential rotation remain the owner's responsibility.
 
 ## System Architecture
 
@@ -71,7 +135,7 @@ flowchart LR
   end
 
   subgraph Sandbox["3. Containment & Persistence"]
-    J["Isolated Docker Sandbox<br/>Network-Disabled, Read-Only Container<br/>Digest-Pinned node:22-alpine"]
+    J["Isolated Docker Sandbox<br/>Network-Disabled, Read-Only Container<br/>Local-Content-ID-Pinned node:22-alpine"]
     K["Loopback PostgreSQL 16<br/>SHA-256 Hash-Based Ledger Reuse"]
     L["OSV Batch API<br/>Exact Dependency Advisories"]
   end
@@ -88,10 +152,10 @@ flowchart LR
 | Subsystem | Implementation | Security and Engineering Invariant |
 |---|---|---|
 | **Six-Phase Adversarial Pipeline**<br/>[`cloudflare-skill-runner.mjs`](cloudflare-skill-runner.mjs) | Stateless role separation across Reconnaissance, Hunting, Critic Waves, Refutation, Schema/Ledger Validation, and Fresh-Eyes Verification | Source-only hunters can never emit `confirmed` findings. Canonical `entrypoint -> sink` trace hashing deduplicates multi-class hits before Phase 3 refutation. |
-| **Contained Candidate Probes**<br/>[`docker-sandbox.mjs`](docker-sandbox.mjs) | Digest-pinned `node:22-alpine` containers: network disabled, read-only rootfs, dropped Linux capabilities, 16 MB scratch `tmpfs`, 256 MB RAM, 32 PIDs | Target code and model-generated probes never reach host networks, credentials, or writable source trees. The parent promotes bounded stdout only after the container exits. |
+| **Contained Candidate Probes**<br/>[`docker-sandbox.mjs`](docker-sandbox.mjs) | Optional local-content-ID-pinned Docker containers: network disabled, read-only rootfs, dropped Linux capabilities, 16 MB scratch `tmpfs`, 256 MB RAM, 32 PIDs | Target code and model-generated probes never reach host networks, credentials, or writable source trees. The parent promotes bounded stdout only after the container exits. |
 | **Incremental PR Diff and Import Closure**<br/>[`server.mjs`](server.mjs) | `computeDiffScope()` parses static JS/TS imports and reverse importers across `git diff <base>...<head>` | Reuses SHA-256-verified `covered` ledger units on unchanged paths. Fails closed to `full_reaudit` on config or lockfile changes, deleted files, dynamic imports, or more than 250 impacted files. |
 | **TOCTOU-Safe Local Collector**<br/>[`server.mjs`](server.mjs) | `collectLocalDirectory()` opens regular files with `O_NOFOLLOW` and verifies `lstat`/`fstat` `(dev, ino)` parity | Prevents symlink-swap traversal outside the target repository root during local filesystem and CLI scans. |
-| **CI/CD and SARIF 2.1.0 Export**<br/>[`kavach-cli.mjs`](kavach-cli.mjs), [`public/sarif.mjs`](public/sarif.mjs), [`action.yml`](action.yml) | Headless CLI (`kavach`), composite GitHub Action, and a [Code Scanning workflow](.github/workflows/kavach-audit.yml) | Emits 64-bit FNV-1a `partialFingerprints` (`kavach/v1`), maps `confirmed` to `error` and `needs_validation` to `warning`, and enforces exit codes `0` / `1` / `2` / `3`. |
+| **CI/CD and SARIF 2.1.0 Export**<br/>[`kavach-cli.mjs`](kavach-cli.mjs), [`public/sarif.mjs`](public/sarif.mjs), [`action.yml`](action.yml) | Headless CLI (`kavach`), composite GitHub Action, and a [Code Scanning workflow](.github/workflows/kavach-audit.yml) | Emits 64-bit FNV-1a `partialFingerprints` (`kavach/v1`), maps confirmed findings to `error`, deterministic source leads to `warning`, structured unverified records to `note`, and enforces exit codes `0` / `1` / `2` / `3`. |
 
 ## Cloudflare Workflow
 
@@ -106,13 +170,15 @@ flowchart LR
 
 ### Profiles and call caps
 
-Choose a profile and a strict call cap from 12 to 512. The run never exceeds its configured cap. Any deferred unit, unresolved candidate, failed validator, unavailable prior-run comparison, or incomplete phase is reported as incomplete.
+Choose a profile and a strict call cap from 12 to 512. The minimum accepted explicit budget is 12; when no budget is supplied, the profile default is used. The run never exceeds its configured cap. Any deferred unit, unresolved candidate, failed validator, unavailable prior-run comparison, or incomplete phase is reported as incomplete.
 
 | Profile | Default call cap |
 |---|---:|
 | Quick | 48 |
 | Standard | 128 |
 | Deep | 256 |
+
+Quick performs one hunting wave and combines candidate validation with final-record verification. Standard repeats coverage work until a distinct final-clean critic accepts the ledger and uses separate Phase 3 and Phase 5 verification. Deep adds a second pass for unchanged coverage carried from a compatible prior run before continuing the standard process. These are audit-review profiles, not vulnerability taxonomies; OSV and Docker checks are separate options.
 
 Previous runs are scoped to the signed-in Firebase user and source identity in PostgreSQL.
 
@@ -130,11 +196,12 @@ Project source stays on your device, except for selected excerpts sent to the mo
 
 ## Model Providers
 
-Choose Ollama, Apple MLX, Apple Foundation Models, Codex CLI, or Gemini CLI in the workspace.
+Choose Ollama, Apple MLX, Apple Foundation Models, Codex CLI, or Gemini CLI in the workspace. The local providers require a service already running on loopback; Kavach does not install models or start model servers.
 
 | Provider | Endpoint / invocation | Notes |
 |---|---|---|
 | **Ollama** | `http://127.0.0.1:11434` | Loopback server; models are listed from it. |
+| **Apple MLX** | `http://127.0.0.1:8080` | MLX-compatible OpenAI-style loopback server; models are listed from it. |
 | **Apple Foundation Models** | `http://127.0.0.1:11437/v1` | Model `apple-fm`. |
 | **Codex CLI** | `codex exec` | Temporary working directory, read-only sandboxing, ephemeral session mode. Run `codex login` and sign in with ChatGPT. Login status is checked before scanning. |
 | **Gemini CLI** | `gemini --prompt` | Temporary working directory, plan mode. Run `gemini` and sign in with Google. Installation is checked before scanning; sign-in is checked when a review begins. Kavach requests deletion of its temporary local session after each call, but Gemini CLI may keep local session records until that command completes. |
@@ -142,7 +209,7 @@ Choose Ollama, Apple MLX, Apple Foundation Models, Codex CLI, or Gemini CLI in t
 Codex CLI and Gemini CLI use the sign-in already configured in those tools; Kavach does not request or store model API keys.
 
 > [!WARNING]
-> With Ollama or MLX, selected source excerpts and audit prompts go to the local loopback model server. With Codex CLI or Gemini CLI, selected excerpts are passed to that tool for processing under its signed-in account. The complete repository is never placed in the CLI working directory. Do not send source to a provider unless its account terms allow it. Each report records which CLI was used and where prompts were processed. Provider quotas, terms, and usage limits apply.
+> With Ollama, MLX, or Apple Foundation Models, selected source excerpts and audit prompts go to the local loopback model server. With Codex CLI or Gemini CLI, selected excerpts are passed to that tool for processing under its signed-in account. The complete repository is never placed in the CLI working directory. Do not send source to a provider unless its account terms allow it. Each report records which provider was used and where prompts were processed. Provider quotas, terms, and usage limits apply.
 
 ### Runtime behavior and tuning
 
@@ -158,7 +225,7 @@ Codex CLI and Gemini CLI use the sign-in already configured in those tools; Kava
 
 ## Docker Sandbox
 
-Kavach checks that Docker is connected to a local Unix socket and pins each run to the locally installed image's content ID. It never runs package installation, project scripts, builds, or arbitrary Git hooks. The Node sandbox does not receive the Docker socket or a mount of the original project folder.
+Kavach checks that Docker is connected to a local Unix socket and pins each run to the locally installed image's content ID. It never pulls an image, runs package installation, project scripts, builds, or arbitrary Git hooks. The Node sandbox does not receive the Docker socket or a mount of the original project folder.
 
 | Setting | Existing tests | Candidate probes |
 |---|---|---|
@@ -218,6 +285,23 @@ node kavach-cli.mjs scan . --provider ollama --model qwen3:8b --docker-probes --
 
 See GitHub's [SARIF upload guide](https://docs.github.com/en/code-security/how-tos/find-and-fix-code-vulnerabilities/integrate-with-existing-tools/upload-sarif-file) and [fork workflow restrictions](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows).
 
+## Dependency Vulnerability Detection
+
+When OSV lookup is enabled, Kavach parses supported manifests and lockfiles, sends only package name, ecosystem, and exact version coordinates to `https://api.osv.dev`, and resolves returned advisory details. Queries are sent in batches of up to 100 dependencies. Advisory aliases are used to display CVE identifiers when OSV supplies them; otherwise the OSV advisory ID is retained. A source-file CVE mention is reported separately and is not treated as an affected dependency.
+
+Dependency severity is a broad OSV-derived label. Kavach first uses an advisory or ecosystem severity label and otherwise maps a numeric advisory score to `LOW`, `MEDIUM`, `HIGH`, or `CRITICAL` using the thresholds in `server.mjs`. It does not calculate CVSS vectors, normalize CWE categories, or independently prove that a dependency is exploitable in the target project. `--fail-on` applies to exact OSV matches and confirmed source findings, not to deterministic source leads.
+
+## Report Outputs
+
+The web interface provides:
+
+- Markdown report download;
+- SARIF 2.1.0 download with source-relative locations and stable `kavach/v1` partial fingerprints;
+- a browser print view that the user can save as PDF; and
+- a client-generated ZIP containing the validated audit artifacts when a model-assisted audit ran.
+
+The CLI writes text, JSON, or SARIF to standard output and can write an output directory containing `result.json`, `REPORT.md`, `results.sarif.json`, and the audit artifacts returned by the workflow. The CLI does not generate a PDF file itself. Model-assisted artifacts include `run-metadata.json`, `architecture.md`, `coverage-ledger.json`, `findings.json`, `REPORT.md`, `FINDINGS-DETAIL.md`, and `NEEDS-VALIDATION.md`; candidate execution files are added only when Docker probes run.
+
 ## Incremental Scans
 
 Load prior coverage from either a portable JSON baseline or `--postgres-cache`, then run `--diff <base>...<head>` on a clean local Git checkout whose `HEAD` matches `<head>`.
@@ -266,13 +350,49 @@ node benchmarks/run.mjs --deterministic-only --out benchmarks/results/determinis
 npm run benchmark -- --provider ollama --model qwen3:8b --runs 3 --out benchmarks/results/qwen3.json
 ```
 
-The deterministic baseline runs in under 50 ms. The model-backed benchmark makes real model calls, so run it only with a model/provider you intend to evaluate. Adding `--docker-probes` also runs candidate-specific checks, but only when Docker and the pinned image are already available.
+The deterministic baseline does not require a model provider. The model-backed benchmark makes real model calls, so run it only with a model/provider you intend to evaluate. Adding `--docker-probes` also runs candidate-specific checks, but only when Docker and the selected local image are already available.
+
+## Project Structure
+
+```text
+.
+├── server.mjs                         Local web server, source intake, OSV, and job orchestration
+├── kavach-cli.mjs                     Headless CLI and exit-code policy
+├── cloudflare-skill-runner.mjs        Six-phase model-assisted workflow and artifacts
+├── audit-workflow.mjs                 Workflow export used by the server and CLI
+├── docker-sandbox.mjs                 Local Docker test and candidate-probe containment
+├── database.mjs                       PostgreSQL history and coverage persistence
+├── firebase-auth.mjs                  Firebase Admin ID-token verification
+├── public/                            Browser UI, Firebase REST client, and SARIF writer
+├── benchmarks/                        Paired fixtures, runner, and checked-in pilot results
+├── tests/                             Node test suite
+├── vendor/cloudflare-security-audit-skill/
+│                                      Vendored schemas, guidance, and validators
+├── action.yml                         Reusable composite GitHub Action
+├── .github/workflows/                 GitHub Code Scanning workflow
+├── compose.yaml                       Local PostgreSQL 16 service
+├── firestore.rules                    Per-user Firestore preference rules
+└── .env.example                       Local configuration template
+```
+
+## Troubleshooting
+
+- **PostgreSQL is offline:** run `docker compose up -d postgres`, confirm `DATABASE_URL` points to `127.0.0.1:54329`, and check `curl http://127.0.0.1:4173/api/postgres/status` after starting the server.
+- **Firebase is not configured:** verify all four Firebase variables in `.env`, restart `npm start`, and enable Email/Password Authentication in the Firebase project.
+- **Email sign-in is rejected:** verify the account's email before signing in. The server rejects unverified Firebase ID tokens.
+- **Docker checks are blocked:** start a local Docker daemon and install the selected image with `docker pull node:22-alpine` (or set `AUDIT_DOCKER_IMAGE` to an existing local image). Kavach will not pull it for you.
+- **A local model is unavailable:** start the selected loopback service, confirm its model name in the workspace, and use only a direct `127.0.0.1` or `::1` URL. Remote model endpoints are rejected.
+- **Codex or Gemini review cannot start:** install the corresponding CLI, sign in in the terminal, and retry. Kavach uses the CLI's existing sign-in and does not manage provider API keys.
+- **The review is incomplete:** inspect `incomplete_reasons`, the phase statuses, and `NEEDS-VALIDATION.md`. Incomplete coverage, unavailable runtime facts, failed validators, and exhausted budgets are retained rather than presented as a clean review.
+- **GitHub Code Scanning upload fails:** retain the SARIF artifact first. Upload requires `security-events: write`, a public repository with Code Scanning support, and a same-repository pull request or push context. Private repositories still keep the workflow artifact but skip SARIF upload in the included workflow.
 
 ## Scope and Limits
 
 - Folder scans read up to 8,000 files and 100 MB, skipping common generated folders, binaries, symlinks, and individual files above 1 MB.
 - Git checkout and Docker staging share a temporary workspace capped at 100 MB. Temporary source copies are removed after report generation, including when a review fails.
 - Git scans accept public HTTPS repositories from GitHub, GitLab, or Bitbucket and fetch a shallow snapshot without submodules.
+- The dependency scanner does not calculate CVSS, assign CWE categories, or perform full transitive resolution for every manifest format; it uses exact versions available in supported manifests and lockfiles.
+- The application does not provide a general-purpose generated PDF export; PDF output is the browser's print/save operation.
 - A source-only review is not a certification and cannot prove that no vulnerabilities remain.
 - A complete six-phase workflow means every procedural phase completed for the reported scope. It does not imply runtime validation or prove safety.
 

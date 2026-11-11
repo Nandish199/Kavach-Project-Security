@@ -1,52 +1,74 @@
-# Kavach Project: A Briefing (V.0.1)
+# Kavach Project Brief (V0.1)
 
-**Goal:** To put security analysis into the normal development workflow—moving security checks from a reactive cleanup after launch to a proactive part of development.
+## Purpose
 
-Kavach is a security suite that checks code and configuration against different defined risk profiles. The result is provided in a standard SARIF format, making the findings easy for other developer tools to read.
+Kavach is a local-first application security review workspace. It combines deterministic source-pattern checks, exact dependency-version matching against OSV, and an optional model-assisted six-phase source review. The result can be consumed by people through Markdown and browser reports or by CI through SARIF 2.1.0.
 
----
+Kavach is a review aid, not a security certification. A source-only result cannot prove runtime exploitability or that a project is safe.
 
-## 🔎 How Kavach Works (The Basics)
+## How Kavach works
 
-Kavach is built around three types of components: the Command-Line Interface (CLI), a background server, and several specialized analysis agents.
+The repository has a web server, a headless CLI, and a shared workflow runner:
 
-**1. The CLI (`kavach-cli.mjs`):** This is the starting point. Developers run the `scan` command. The CLI manages the process, taking inputs like the project path and the chosen risk profile.
-**2. The Server (`server.mjs`):** This component runs in the background. It handles any long-running processes or state tracking that a single, quick scan command can't manage.
-**3. Analysis Agents:** These are the modular runners. They do the heavy lifting, checking for things like specific vulnerabilities or code patterns based on what profile was selected.
+1. `server.mjs` serves the local browser workspace, collects a local folder or public HTTPS Git checkout, runs deterministic checks, parses dependencies, optionally queries OSV, and starts the review.
+2. `kavach-cli.mjs` runs the same pipeline without Firebase or the web server and can write SARIF, JSON, Markdown, baselines, and audit artifacts.
+3. `cloudflare-skill-runner.mjs` runs six fresh, stateless review roles through one selected model provider. These are prompt roles inside the parent process, not independent delegated agents.
+4. `docker-sandbox.mjs` optionally runs selected Node tests or candidate-specific probes in a local network-disabled Docker container.
+5. `database.mjs` stores per-user review history in local PostgreSQL when the web interface or `--postgres-cache` requests persistence.
 
-**The Workflow (A quick rundown):**
-1.  **You start it:** Run `npm run scan`.
-2.  **Checks run:** The CLI picks the right set of agents (based on your chosen profile).
-3.  **Findings come in:** The agents run and generate raw data.
-4.  **Final file:** Everything is gathered, cleaned up, and written into one file: `kavach.sarif.json`.
-5.  **Exit:** The tool finishes with a specific exit code (0 means perfect, 1 means some issues were found, 2 or 3 means a technical error occurred).
+## Six phases
 
-## 🛡️ How to Adjust the Scan (Profiles & Risks)
+1. Reconnaissance maps the product, principals, trust boundaries, source surfaces, sinks, and local checks.
+2. Coverage-led hunting assigns source excerpts to stateless review prompts and uses coverage critics.
+3. Candidate validation rereads and attempts to refute source-grounded candidates; optional Docker probes provide bounded local evidence.
+4. Structured output validates findings and coverage records against vendored contracts.
+5. Independent verification checks retained records with fresh evidence. Quick combines this with Phase 3; Standard and Deep use separate verification.
+6. Target-neutral reporting writes the final posture summary and structured artifacts from validated facts.
 
-You control how deep the audit goes using **Security Profiles**.
+## Profiles and budgets
 
-*   **`quick` (Default):** Use this for quick CI checks. It runs light, fast checks on the most obvious, high-risk issues.
-*   **`standard`:** This is the typical day-to-day check. It balances speed with depth by running dependency checks and basic pattern matching.
-*   **`deep`:** Maximum effort. Use this when you want the most thorough audit possible. It consumes the maximum resource budget (up to 512 model-call limits).
+Profiles change review depth, not vulnerability categories:
 
-We also enforce operational constraints:
-*   **`path` (Required):** Where the project lives.
-*   **`sarif-file` (Output):** Where the final SARIF output will land (default is `.kavach/kavach.sarif.json`).
-*   **`fail-on` (Threshold):** This tells the CI system when to fail. The options are `confirmed`, `high`, `critical`, or `never`.
-*   **`budget` (Cost Control):** A hard limit on resources (12 to 512). This prevents a rogue script from running forever.
-*   **`osv`:** If set to true, the tool checks the Open Source Vulnerability (OSV) database for dependency versions.
+| Profile | Default model-call cap | Summary |
+|---|---:|---|
+| `quick` | 48 | One hunting wave and combined candidate/final verification. |
+| `standard` | 128 | Repeated coverage work with separate Phase 3 and Phase 5 verification. |
+| `deep` | 256 | Standard behavior plus a second pass for compatible prior coverage. |
 
-## 💻 What Runs It (Tech Stack)
+An explicit budget must be an integer from 12 through 512. Twelve is the minimum accepted value, not the default. The web UI and CLI default to Standard; the GitHub Action defaults to Quick.
 
-Kavach has a few environmental requirements:
+## Inputs and outputs
 
-*   **Runtime:** You need **Node.js** version 22 or newer.
-*   **Dependencies:** We rely on standard NodeJS tools. Specifically:
-    *   `dotenv`: This is used so sensitive configuration is stored externally.
-    *   `firebase-admin` and `pg`: These dependencies show the project is set up to handle cloud credentials or potentially interact with a PostgreSQL logging mechanism.
+The CLI accepts a local path or public HTTPS GitHub, GitLab, or Bitbucket URL. Important options include `--profile`, `--budget`, `--provider`, `--model`, `--osv`, `--docker-tests`, `--docker-probes`, `--scope`, `--diff`, `--baseline`, `--postgres-cache`, `--sarif`, `--output-dir`, `--fail-on`, and `--require-complete`.
 
-## 🎯 Why This Matters
+Exit codes are:
 
-Kavach provides a solid, reliable base for security checks. It successfully forces a disciplined look at the code *before* it gets merged. The next steps are really about expanding the agent set—building out the specialized checks we are currently covering in a single profile.
+- `0`: the configured policy threshold was not reached;
+- `1`: the configured threshold was reached;
+- `2`: invalid input or runtime error; and
+- `3`: the six-phase workflow was incomplete and `--require-complete` was selected.
 
-*This brief was created by a human reviewer, pulling facts from the project manifests and configurations.*
+The web interface downloads Markdown and SARIF, offers browser print/save-to-PDF, and creates a ZIP of model-assisted audit artifacts. The CLI output directory contains `result.json`, `REPORT.md`, `results.sarif.json`, and any returned workflow artifacts.
+
+## Technology and security boundaries
+
+- Node.js 22 or newer, native ESM, and npm.
+- Firebase email/password Authentication for verified web accounts; Firebase Admin verifies ID tokens.
+- Firestore stores only per-user model and review preferences.
+- PostgreSQL is restricted to localhost and stores review history scoped by Firebase UID or the CLI's local identity.
+- OSV receives package coordinates and exact versions only; repository source is not sent to OSV.
+- Local model endpoints are restricted to loopback. Codex and Gemini use their existing signed-in CLI sessions with temporary workspaces.
+- Docker checks use a preinstalled local image, `--pull=never`, a local content ID, no network, a read-only root filesystem and source mount, dropped capabilities, no-new-privileges, bounded memory/CPU/PIDs, and a scratch `tmpfs`.
+
+The dependency path does not calculate CVSS vectors, assign CWE categories, or guarantee complete transitive resolution. The source path emits leads that require evidence and may remain `needs_validation`.
+
+## Local setup
+
+```sh
+cp .env.example .env
+docker compose up -d postgres
+npm install
+npm start
+```
+
+Open `http://localhost:4173`. Set the Firebase web configuration and local PostgreSQL values in `.env`; do not commit `.env`. Docker and model providers are optional. For headless scans, use `node kavach-cli.mjs --help`.

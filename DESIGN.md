@@ -6,7 +6,7 @@ The visual reference is Hallmark’s Cobalt theme page: <https://www.usehallmark
 
 The Hallmark repository describes its design approach as building each page around the visitor’s actual task, preserving working content and controls during a redesign, and checking craft details instead of repeating default interface patterns: <https://github.com/Nutlope/hallmark>. Kavach adapts those principles to a project review workspace with a clear source choice, visible privacy boundary, evidence-led findings, and a report path.
 
-The audit flow is adapted from Cloudflare’s six-phase security-audit-skill: <https://github.com/cloudflare/security-audit-skill>. Kavach runs reconnaissance, coverage-led hunting, candidate validation, structured record checks, independent final-record review, and report generation. Reviewer roles are separate stateless prompts sent to the same local model; this is not the skill package’s delegated-agent runtime. Target-controlled code is not executed because the app does not provide its required OS-enforced sandbox.
+The audit flow is adapted from Cloudflare’s six-phase security-audit-skill: <https://github.com/cloudflare/security-audit-skill>. Kavach runs reconnaissance, coverage-led hunting, candidate validation, structured record checks, independent final-record review, and report generation. Reviewer roles are separate stateless prompts sent to the same selected model provider; this is not the skill package’s delegated-agent runtime. Kavach provides a bounded local Docker sandbox for selected existing Node tests and candidate-specific probes, but it does not execute arbitrary project builds, installs, scripts, hooks, live services, or other language runtimes.
 
 ## Extracted from the Hallmark Cobalt reference
 

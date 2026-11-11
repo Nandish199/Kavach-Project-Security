@@ -21,13 +21,13 @@ inputs:
     description: Maximum model-call budget, from 12 to 512.
     required: false
   provider:
-    description: Optional configured provider (ollama, mlx, codex, or gemini-cli).
+    description: Optional configured provider (ollama, mlx, apple-fm, codex, or gemini-cli).
     required: false
   model:
     description: Model ID required when provider is set.
     required: false
   model-base:
-    description: Loopback Ollama or MLX server URL for a self-hosted runner.
+    description: Loopback Ollama, MLX, or Apple Foundation Models server URL for a self-hosted runner.
     required: false
   osv:
     description: Query OSV with exact dependency versions.
