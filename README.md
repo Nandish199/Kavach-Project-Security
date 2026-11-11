@@ -135,7 +135,6 @@ Choose Ollama, Apple MLX, Apple Foundation Models, Codex CLI, or Gemini CLI in t
 | Provider | Endpoint / invocation | Notes |
 |---|---|---|
 | **Ollama** | `http://127.0.0.1:11434` | Loopback server; models are listed from it. |
-| **Apple MLX** | `http://127.0.0.1:8080` | Loopback server; models are listed from it. |
 | **Apple Foundation Models** | `http://127.0.0.1:11437/v1` | Model `apple-fm`. |
 | **Codex CLI** | `codex exec` | Temporary working directory, read-only sandboxing, ephemeral session mode. Run `codex login` and sign in with ChatGPT. Login status is checked before scanning. |
 | **Gemini CLI** | `gemini --prompt` | Temporary working directory, plan mode. Run `gemini` and sign in with Google. Installation is checked before scanning; sign-in is checked when a review begins. Kavach requests deletion of its temporary local session after each call, but Gemini CLI may keep local session records until that command completes. |
